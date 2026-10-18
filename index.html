@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusBuzz — One Campus. Every Event.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --ink:#14132B;
+  --ink-soft:#2A2850;
+  --indigo:#4F3DF5;
+  --indigo-deep:#3A2CD1;
+  --violet:#8B5CF6;
+  --cyan:#17B6C2;
+  --yellow:#EAB308;
+  --green:#16A34A;
+  --red:#E11D48;
+  --paper:#F6F5FC;
+  --card:#FFFFFF;
+  --line:#E7E4F6;
+  --muted:#6B6792;
+  --muted-2:#918CAE;
+  --shadow: 0 1px 3px rgba(20,19,43,0.05), 0 8px 24px -8px rgba(20,19,43,0.08);
+  --shadow-lg: 0 4px 12px rgba(20,19,43,0.06), 0 20px 44px -12px rgba(20,19,43,0.16);
+  --radius: 18px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4,.display{font-family:'Space Grotesk',sans-serif;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+::-webkit-scrollbar{width:7px;height:7px;}
+::-webkit-scrollbar-thumb{background:#D8D4F0;border-radius:8px;}
+.container{max-width:1240px;margin:0 auto;padding:0 32px;}
+@media(max-width:640px){.container{padding:0 18px;}}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;font-weight:600;font-size:14.5px;border:none;transition:all .18s ease;white-space:nowrap;user-select:none;}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--indigo);color:#fff;box-shadow:0 8px 20px -6px rgba(79,61,245,0.55);}
+.btn-primary:hover{background:var(--indigo-deep);box-shadow:0 10px 24px -6px rgba(79,61,245,0.65);transform:translateY(-1px);}
+.btn-dark{background:var(--ink);color:#fff;}
+.btn-dark:hover{background:var(--ink-soft);}
+.btn-outline{background:#fff;color:var(--ink);border:1.5px solid var(--line);}
+.btn-outline:hover{border-color:var(--indigo);color:var(--indigo);background:#FAF9FF;}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent;}
+.btn-ghost:hover{color:var(--ink);background:#EFEBFA;}
+.btn-sm{padding:8px 15px;font-size:13px;border-radius:10px;}
+.btn-block{width:100%;}
+.btn-danger{background:#FFF1F2;color:var(--red);border:1px solid #FFE4E6;}
+.btn-danger:hover{background:#FFE4E6;}
+.btn[disabled]{opacity:.55;cursor:not-allowed;transform:none !important;box-shadow:none !important;}
+
+/* Back Navigation Button */
+.nav-back-btn{display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:10px;background:#fff;border:1.5px solid var(--line);color:var(--ink);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .15s ease;}
+.nav-back-btn:hover{background:#F4F2FD;border-color:var(--indigo);color:var(--indigo);transform:translateX(-2px);}
+.nav-back-btn svg{transition:transform .15s ease;}
+.nav-back-btn:hover svg{transform:translateX(-2px);}
+
+/* Card */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
+.card-pad{padding:24px;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:12px;font-weight:600;}
+.badge-indigo{background:#EEEBFE;color:var(--indigo-deep);}
+.badge-cyan{background:#E2F7F9;color:#0B7882;}
+.badge-yellow{background:#FEF9C3;color:#854D0E;}
+.badge-green{background:#DCFCE7;color:#15803D;}
+.badge-red{background:#FFE4E6;color:#BE123C;}
+.badge-grey{background:#F0EEFA;color:var(--muted);}
+
+/* Form Fields */
+.field label{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:7px;}
+.field input,.field select,.field textarea{width:100%;padding:11px 14px;border-radius:11px;border:1.5px solid var(--line);background:#fff;font-size:14px;font-family:inherit;color:var(--ink);transition:border-color .15s,box-shadow .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--indigo);box-shadow:0 0 0 3px rgba(79,61,245,0.12);}
+.field{margin-bottom:18px;}
+
+/* Topnav */
+.topnav{position:sticky;top:0;z-index:40;background:rgba(246,245,252,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;font-size:20px;letter-spacing:-0.02em;user-select:none;}
+.logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--indigo),var(--violet));display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 4px 10px rgba(79,61,245,0.3);}
+
+/* App Shell (Dashboard) */
+.shell{display:flex;min-height:100vh;}
+.sidebar{width:252px;flex-shrink:0;background:var(--ink);color:#fff;display:flex;flex-direction:column;padding:22px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-link{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:11px;color:#A9A5D6;font-size:14px;font-weight:500;margin-bottom:3px;cursor:pointer;transition:all .15s;}
+.sidebar-link:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.sidebar-link.active{background:rgba(255,255,255,0.12);color:#fff;font-weight:600;}
+.sidebar-link .ic{width:18px;display:flex;align-items:center;justify-content:center;}
+.main-area{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(246,245,252,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.content{padding:28px 32px 80px;flex:1;}
+@media(max-width:900px){.sidebar{display:none;} .content{padding:20px 16px 100px;} .topbar{padding:12px 16px;}}
+
+/* Avatar */
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--indigo),var(--cyan));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13.5px;flex-shrink:0;letter-spacing:-0.02em;}
+
+/* Toast */
+#toastHost{position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:10px;}
+@media(max-width:640px){#toastHost{right:12px;left:12px;bottom:84px;}}
+.toast{background:var(--ink);color:#fff;padding:13px 18px;border-radius:12px;font-size:13.5px;font-weight:500;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;animation:toastIn .22s ease;min-width:240px;border:1px solid rgba(255,255,255,0.08);}
+@keyframes toastIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* Skeletons & Utilities */
+.sk{background:linear-gradient(90deg,#ECEAF9 25%,#F5F3FD 37%,#ECEAF9 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:10px;}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.divider{height:1px;background:var(--line);}
+.hover-lift{transition:transform .18s ease, box-shadow .18s ease;}
+.hover-lift:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.tag-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.pulse-dot{animation:pulseDot 1.8s ease infinite;}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
+.fade-in{animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Mobile Bottom Nav */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:none;justify-content:space-around;padding:7px 4px 9px;z-index:50;}
+@media(max-width:900px){.bottomnav{display:flex;}}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted-2);font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px;cursor:pointer;}
+.bn-item.active{color:var(--indigo);}
+
+/* Certificate */
+.certificate{background:linear-gradient(180deg,#FFFFFF 0%, #FAF8FF 100%);border:2.5px solid #E2DCFA;border-radius:24px;padding:52px 44px;position:relative;overflow:hidden;text-align:center;box-shadow:0 12px 36px -10px rgba(79,61,245,0.12);}
+.certificate:before,.certificate:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(79,61,245,0.08),transparent 70%);}
+.certificate:before{top:-100px;left:-100px;}
+.certificate:after{bottom:-100px;right:-100px;background:radial-gradient(circle,rgba(234,179,8,0.12),transparent 70%);}
+
+/* QR Screen */
+.qr-box{width:220px;height:220px;border-radius:20px;background:#fff;border:2px dashed var(--line);display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:var(--shadow);}
+.grad-text{background:linear-gradient(90deg,var(--indigo),var(--violet) 60%, var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;}
+
+/* Quick Role Switcher Pill */
+.role-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;background:#fff;border:1px solid var(--line);font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-soft);transition:all .15s;}
+.role-pill:hover{background:#F4F2FD;border-color:var(--indigo);color:var(--indigo);}
+.role-pill.active{background:var(--indigo);color:#fff;border-color:var(--indigo);}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div id="toastHost"></div>
+
+<script>
+/* =========================================================
+   DYNAMIC DATE SYSTEM (Updates Everyday Automatically)
+========================================================= */
+function getRelativeDate(offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fmtDate(dStr, relative=false) {
+  if(!dStr) return '';
+  const parts = dStr.split('-');
+  if(parts.length < 3) return dStr;
+  const dt = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const target = new Date(dt);
+  target.setHours(0,0,0,0);
+  const diffDays = Math.round((target - today) / (1000 * 60 * 60 * 24));
+
+  const standard = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (!relative) return standard;
+  if (diffDays === 0) return `Today (${standard})`;
+  if (diffDays === 1) return `Tomorrow (${standard})`;
+  if (diffDays === -1) return `Yesterday (${standard})`;
+  if (diffDays > 1 && diffDays <= 6) return `In ${diffDays} days (${standard})`;
+  return standard;
+}
+
+function getTodayFormatted() {
+  return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+/* =========================================================
+   CLEAN VECTOR ICONS (No Emojis)
+========================================================= */
+const ICONS = {
+  home:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>',
+  compass:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 8l-4 8-4-4z"/></svg>',
+  cal:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  ticket:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 000 4v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2a2 2 0 000-4z"/></svg>',
+  award:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M8.5 13L7 22l5-3 5 3-1.5-9"/></svg>',
+  bell:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>',
+  user:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  plus:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 5v14M5 12h14"/></svg>',
+  qr:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z"/></svg>',
+  chart:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>',
+  check:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M20 6L9 17l-5-5"/></svg>',
+  chevR:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6"/></svg>',
+  chevL:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>',
+  arrowLeft:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>',
+  search:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  pin:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s7-6.6 7-12a7 7 0 10-14 0c0 5.4 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>',
+  clock:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+  users:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>',
+  logout:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>',
+  bldg:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1"/></svg>',
+  layers:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l9 5-9 5-9-5 9-5z"/><path d="M3 12l9 5 9-5M3 17l9 5 9-5"/></svg>',
+  star:'<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.1 6.3 6.9 1-5 4.9L18.2 21 12 17.8 5.8 21 7 14.2l-5-4.9 6.9-1z"/></svg>',
+  spark:'<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z"/></svg>',
+  download:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M6 11l6 6 6-6"/><path d="M4 21h16"/></svg>',
+  shield:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  academic:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>',
+  code:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+  rocket:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6.05 11a22.35 22.35 0 01-3.95 2z"/></svg>',
+  tools:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>',
+  mic:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>',
+  trophy:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4a2 2 0 01-2-2V5a2 2 0 012-2h2M18 9h2a2 2 0 002-2V5a2 2 0 00-2-2h-2M6 3h12v7a6 6 0 01-12 0V3z"/><path d="M9 21h6M12 17v4"/></svg>',
+  art:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 011.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"/></svg>',
+  briefcase:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>',
+  inbox:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>',
+};
+
+const ic = (name, size) => {
+  let s = ICONS[name] || '';
+  return size ? s.replace(/width="\d+"/, `width="${size}"`).replace(/height="\d+"/, `height="${size}"`) : s;
+};
+
+/* =========================================================
+   CLEAN CATEGORIES (Replaced Emojis with Clean SVGs)
+========================================================= */
+const CATEGORIES = [
+  {id:'tech', name:'Technical', iconName:'code', color:'#4F3DF5'},
+  {id:'academic', name:'Academic', iconName:'academic', color:'#17B6C2'},
+  {id:'hackathon', name:'Hackathons', iconName:'rocket', color:'#FF6B4A'},
+  {id:'workshop', name:'Workshops', iconName:'tools', color:'#8B5CF6'},
+  {id:'seminar', name:'Seminars', iconName:'mic', color:'#16A34A'},
+  {id:'competition', name:'Competitions', iconName:'trophy', color:'#EAB308'},
+  {id:'cultural', name:'Cultural', iconName:'art', color:'#E11D48'},
+  {id:'career', name:'Career', iconName:'briefcase', color:'#0E8892'},
+];
+
+const DEPARTMENTS = ['Computer Science','Electronics','Mechanical','Data Science','Management Studies'];
+const VENUES = [
+  {name:'Seminar Hall A', building:'Academic Block 1', capacity:250},
+  {name:'Seminar Hall B', building:'Academic Block 1', capacity:180},
+  {name:'Innovation Lab', building:'Tech Park', capacity:120},
+  {name:'Main Auditorium', building:'Central Block', capacity:500},
+  {name:'Conference Room 3', building:'Admin Block', capacity:60},
+];
+
+/* =========================================================
+   DATA INITIALIZATION WITH DYNAMIC DATES
+========================================================= */
+// User name is Anushka Sugandhi
+const CURRENT_STUDENT = {
+  name: 'Anushka Sugandhi',
+  id: 'CS21B045',
+  dept: 'Computer Science',
+  year: '3rd Year',
+  interests: ['tech', 'workshop', 'hackathon']
+};
+const CURRENT_ORGANIZER = { name: 'Dr. Meera Rao', dept: 'Computer Science', club: 'AI Club' };
+const CURRENT_ADMIN = { name: 'Institution Admin', role: 'Head Administrator' };
+
+let events = [
+  {
+    id:'e1',
+    title:'AI Innovation Summit 2026',
+    category:'tech',
+    dept:'Computer Science',
+    desc:'A full-day summit exploring how generative AI is reshaping product design, research, and industry careers, with live demos from campus labs and industry guests.',
+    img:'linear-gradient(135deg,#4F3DF5,#8B5CF6)',
+    date: getRelativeDate(2), // In 2 days
+    start:'10:00 AM',
+    end:'4:30 PM',
+    venue:'Main Auditorium',
+    deadline: getRelativeDate(1),
+    capacity:200,
+    registered:142,
+    organizer:'Dr. Meera Rao',
+    club:'AI Club',
+    status:'published',
+    rating:4.8,
+    speakers:[{name:'Ritika Menon', role:'ML Lead, Nimbus AI'},{name:'Arjun Verma', role:'Founder, DeepStack'}],
+    schedule:[['10:00','Registration & Networking'],['10:30','Opening Keynote'],['12:00','Panel: AI in Industry'],['1:30','Lunch Break'],['2:30','Hands-on Workshop'],['4:00','Closing & Certificates']]
+  },
+  {
+    id:'e2',
+    title:'National Level Hackathon',
+    category:'hackathon',
+    dept:'Computer Science',
+    desc:'24-hour build sprint for teams of up to four, tackling open problem statements in sustainability, fintech, and campus life.',
+    img:'linear-gradient(135deg,#FF6B4A,#EAB308)',
+    date: getRelativeDate(6), // In 6 days
+    start:'9:00 AM',
+    end:'9:00 AM +1',
+    venue:'Innovation Lab',
+    deadline: getRelativeDate(4),
+    capacity:300,
+    registered:258,
+    organizer:'Prof. Karan Shah',
+    club:'Coding Club',
+    status:'published',
+    rating:4.9,
+    speakers:[{name:'Neha Kapoor', role:'CTO, Loopwire'}],
+    schedule:[['9:00','Kickoff & Team Formation'],['10:00','Hacking Begins'],['+1 6:00','Submissions Close'],['+1 8:00','Judging & Awards']]
+  },
+  {
+    id:'e3',
+    title:'Future of Data Analytics',
+    category:'workshop',
+    dept:'Data Science',
+    desc:'Hands-on workshop covering the modern analytics stack — from data cleaning to dashboards — for beginners and intermediate students.',
+    img:'linear-gradient(135deg,#17B6C2,#4F3DF5)',
+    date: getRelativeDate(0), // TODAY!
+    start:'9:00 AM',
+    end:'1:00 PM',
+    venue:'Seminar Hall A',
+    deadline: getRelativeDate(0),
+    capacity:150,
+    registered:98,
+    organizer:'Dr. Meera Rao',
+    club:'Data Science Club',
+    status:'published',
+    rating:4.5,
+    speakers:[{name:'Sana Iyer', role:'Analyst, Fractal'}],
+    schedule:[['9:00','Setup & Intro'],['10:00','Cleaning Real Datasets'],['11:30','Building Dashboards'],['12:45','Wrap-up']]
+  },
+  {
+    id:'e4',
+    title:'Cybersecurity Awareness Workshop',
+    category:'workshop',
+    dept:'Electronics',
+    desc:'Practical session on password hygiene, phishing recognition, and secure coding basics for everyday campus systems.',
+    img:'linear-gradient(135deg,#8B5CF6,#17B6C2)',
+    date: getRelativeDate(1), // Tomorrow!
+    start:'11:00 AM',
+    end:'1:00 PM',
+    venue:'Conference Room 3',
+    deadline: getRelativeDate(0),
+    capacity:60,
+    registered:42,
+    organizer:'Prof. Karan Shah',
+    club:'Robotics Club',
+    status:'published',
+    rating:4.4,
+    speakers:[],
+    schedule:[['11:00','Common Threats Today'],['11:45','Live Phishing Demo'],['12:30','Q&A']]
+  },
+  {
+    id:'e5',
+    title:'Industry Connect: Careers in Tech',
+    category:'career',
+    dept:'Management Studies',
+    desc:'Recruiters and alumni share what they look for in fresh graduates, followed by an interactive resume clinic.',
+    img:'linear-gradient(135deg,#0E8892,#17B6C2)',
+    date: getRelativeDate(4), // In 4 days
+    start:'2:00 PM',
+    end:'5:00 PM',
+    venue:'Seminar Hall B',
+    deadline: getRelativeDate(3),
+    capacity:180,
+    registered:115,
+    organizer:'Ms. Ritu Bhalla',
+    club:'Placement Cell',
+    status:'published',
+    rating:4.6,
+    speakers:[{name:'Vikram Das', role:'HR Head, Contify'}],
+    schedule:[['2:00','Panel Discussion'],['3:30','Resume Clinic'],['4:30','1:1 Mentoring']]
+  },
+  {
+    id:'e6',
+    title:'Robotics Circuit Challenge',
+    category:'competition',
+    dept:'Mechanical',
+    desc:'Teams design and race autonomous bots through an obstacle circuit for the annual robotics trophy.',
+    img:'linear-gradient(135deg,#FF6B4A,#E11D48)',
+    date: getRelativeDate(9),
+    start:'10:00 AM',
+    end:'6:00 PM',
+    venue:'Innovation Lab',
+    deadline: getRelativeDate(7),
+    capacity:120,
+    registered:90,
+    organizer:'Prof. Karan Shah',
+    club:'Robotics Club',
+    status:'published',
+    rating:4.7,
+    speakers:[],
+    schedule:[['10:00','Bot Check-in'],['11:00','Qualifiers'],['3:00','Finals'],['5:30','Prize Distribution']]
+  },
+  {
+    id:'e7',
+    title:'Entrepreneurship Bootcamp',
+    category:'workshop',
+    dept:'Management Studies',
+    desc:'Two-session bootcamp on validating an idea, building a pitch deck, and approaching early investors.',
+    img:'linear-gradient(135deg,#EAB308,#FF6B4A)',
+    date: getRelativeDate(12),
+    start:'10:00 AM',
+    end:'3:00 PM',
+    venue:'Seminar Hall A',
+    deadline: getRelativeDate(10),
+    capacity:100,
+    registered:66,
+    organizer:'Ms. Ritu Bhalla',
+    club:'Entrepreneurship Cell',
+    status:'published',
+    rating:4.3,
+    speakers:[{name:'Farah Sheikh', role:'Founder, Ketchup Foods'}],
+    schedule:[['10:00','Idea Validation'],['12:00','Pitch Deck Lab'],['2:00','Investor Q&A']]
+  },
+  {
+    id:'e8',
+    title:'Research & Innovation Symposium',
+    category:'academic',
+    dept:'Computer Science',
+    desc:'Undergraduate and postgraduate researchers present papers and posters across multidisciplinary departments.',
+    img:'linear-gradient(135deg,#4F3DF5,#17B6C2)',
+    date: getRelativeDate(15),
+    start:'9:30 AM',
+    end:'4:00 PM',
+    venue:'Main Auditorium',
+    deadline: getRelativeDate(13),
+    capacity:220,
+    registered:154,
+    organizer:'Dr. Meera Rao',
+    club:'Academic Council',
+    status:'published',
+    rating:4.6,
+    speakers:[],
+    schedule:[['9:30','Poster Session'],['11:00','Paper Presentations'],['2:00','Keynote'],['3:30','Awards']]
+  },
+  {
+    id:'e9',
+    title:'Cultural Fest — Tarang 2026',
+    category:'cultural',
+    dept:'Management Studies',
+    desc:'The annual cross-department cultural festival with music, dance, and theatre competitions.',
+    img:'linear-gradient(135deg,#E11D48,#EAB308)',
+    date: getRelativeDate(20),
+    start:'5:00 PM',
+    end:'10:00 PM',
+    venue:'Main Auditorium',
+    deadline: getRelativeDate(18),
+    capacity:500,
+    registered:392,
+    organizer:'Ms. Ritu Bhalla',
+    club:'Cultural Club',
+    status:'published',
+    rating:4.9,
+    speakers:[],
+    schedule:[['5:00','Opening Act'],['6:30','Dance Competition'],['8:00','Live Band'],['9:30','Prize Night']]
+  },
+  {
+    id:'e10',
+    title:'AI & Future of Work — Guest Lecture',
+    category:'seminar',
+    dept:'Computer Science',
+    desc:'A guest lecture on how AI adoption is changing entry-level roles across industries, with practical strategies.',
+    img:'linear-gradient(135deg,#8B5CF6,#4F3DF5)',
+    date: getRelativeDate(3),
+    start:'10:00 AM',
+    end:'11:30 AM',
+    venue:'Seminar Hall A',
+    deadline: getRelativeDate(2),
+    capacity:150,
+    registered:150,
+    organizer:'Dr. Meera Rao',
+    club:'AI Club',
+    status:'published',
+    rating:4.7,
+    speakers:[{name:'Ritika Menon', role:'ML Lead, Nimbus AI'}],
+    schedule:[['10:00','Lecture'],['11:00','Open Q&A']]
+  },
+  {
+    id:'e11',
+    title:'Python for Data Workshop',
+    category:'workshop',
+    dept:'Data Science',
+    desc:'A comprehensive introduction to Python for students with zero coding background, building up to live data visualization.',
+    img:'linear-gradient(135deg,#17B6C2,#16A34A)',
+    date: getRelativeDate(-4), // Completed 4 days ago
+    start:'9:00 AM',
+    end:'12:00 PM',
+    venue:'Innovation Lab',
+    deadline: getRelativeDate(-5),
+    capacity:80,
+    registered:80,
+    organizer:'Prof. Karan Shah',
+    club:'Coding Club',
+    status:'completed',
+    rating:4.6,
+    speakers:[],
+    schedule:[['9:00','Basics'],['10:30','Practice'],['11:30','Wrap-up']]
+  },
+  {
+    id:'e12',
+    title:'Tech Symposium 2026',
+    category:'tech',
+    dept:'Computer Science',
+    desc:'A department-wide showcase of student capstone projects across AI, cloud computing, and embedded systems.',
+    img:'linear-gradient(135deg,#4F3DF5,#FF6B4A)',
+    date: getRelativeDate(-8), // Completed 8 days ago
+    start:'10:00 AM',
+    end:'3:00 PM',
+    venue:'Seminar Hall B',
+    deadline: getRelativeDate(-9),
+    capacity:150,
+    registered:150,
+    organizer:'Dr. Meera Rao',
+    club:'AI Club',
+    status:'completed',
+    rating:4.8,
+    speakers:[],
+    schedule:[['10:00','Project Showcase'],['1:00','Judging'],['2:30','Awards']]
+  },
+  {
+    id:'e13',
+    title:'UX Design Sprint',
+    category:'workshop',
+    dept:'Computer Science',
+    desc:'A one-day design sprint teaching user research, wireframing, and interactive prototyping.',
+    img:'linear-gradient(135deg,#8B5CF6,#E11D48)',
+    date: getRelativeDate(11),
+    start:'10:00 AM',
+    end:'4:00 PM',
+    venue:'Conference Room 3',
+    deadline: getRelativeDate(9),
+    capacity:50,
+    registered:14,
+    organizer:'Ms. Ritu Bhalla',
+    club:'Design Circle',
+    status:'pending',
+    rating:0,
+    speakers:[],
+    schedule:[['10:00','Research Basics'],['12:00','Wireframing'],['2:00','Prototyping']]
+  },
+  {
+    id:'e14',
+    title:'Blockchain Basics Meetup',
+    category:'tech',
+    dept:'Computer Science',
+    desc:'An evening meetup demystifying smart contracts, decentralized consensus, and Web3 developments.',
+    img:'linear-gradient(135deg,#17B6C2,#8B5CF6)',
+    date: getRelativeDate(14),
+    start:'5:00 PM',
+    end:'7:00 PM',
+    venue:'Innovation Lab',
+    deadline: getRelativeDate(12),
+    capacity:70,
+    registered:11,
+    organizer:'Prof. Karan Shah',
+    club:'Coding Club',
+    status:'pending',
+    rating:0,
+    speakers:[],
+    schedule:[['5:00','Talk'],['6:00','Discussion']]
+  },
+  {
+    id:'e15',
+    title:'Inter-College Debate Championship',
+    category:'competition',
+    dept:'Management Studies',
+    desc:'Collegiate teams compete in British Parliamentary format debates on tech ethics and global economics.',
+    img:'linear-gradient(135deg,#EAB308,#17B6C2)',
+    date: getRelativeDate(22),
+    start:'9:00 AM',
+    end:'5:00 PM',
+    venue:'Main Auditorium',
+    deadline: getRelativeDate(20),
+    capacity:200,
+    registered:0,
+    organizer:'Ms. Ritu Bhalla',
+    club:'Debate Society',
+    status:'draft',
+    rating:0,
+    speakers:[],
+    schedule:[['9:00','Prelims'],['2:00','Semis'],['4:00','Finals']]
+  },
+];
+
+let registrations = [
+  {eventId:'e1', status:'confirmed'},
+  {eventId:'e3', status:'confirmed'},
+  {eventId:'e10', status:'confirmed'},
+  {eventId:'e11', status:'confirmed', attended:true, certIssued:true},
+  {eventId:'e12', status:'confirmed', attended:true, certIssued:true},
+];
+
+let notifications = [
+  {id:'n1', icon:'check', text:'Your registration for "AI Innovation Summit 2026" is confirmed.', time:'2 hours ago', unread:true},
+  {id:'n2', icon:'pin', text:'Venue for "Future of Data Analytics" confirmed at Seminar Hall A today.', time:'5 hours ago', unread:true},
+  {id:'n3', icon:'award', text:'Certificate issued for "Tech Symposium 2026".', time:'Yesterday', unread:false},
+  {id:'n4', icon:'bell', text:'New event announced in Computer Science: "National Level Hackathon".', time:'2 days ago', unread:false},
+];
+
+let activityLog = [
+  {text:'Registered for AI Innovation Summit 2026', time:'2 hours ago'},
+  {text:'Checked venue updates for today\'s events', time:'5 hours ago'},
+  {text:'Attended Tech Symposium 2026', time:'8 days ago'},
+  {text:'Certificate earned for Tech Symposium 2026', time:'8 days ago'},
+  {text:'Completed Python for Data Workshop', time:'4 days ago'},
+];
+
+/* =========================================================
+   APPLICATION NAVIGATION STATE (WITH ROBUST HISTORY)
+========================================================= */
+const state = {
+  role: null,           // 'student' | 'organizer' | 'admin' | null
+  view: 'landing',
+  params: {},
+  createStep: 1,
+  createDraft: {},
+  history: [],          // Navigation stack for "Going Back"
+};
+
+function canGoBack() {
+  return state.history.length > 0;
+}
+
+function go(view, params={}, isBack=false) {
+  if (!isBack && (state.view !== view || JSON.stringify(state.params) !== JSON.stringify(params))) {
+    state.history.push({
+      view: state.view,
+      params: JSON.parse(JSON.stringify(state.params)),
+      role: state.role
+    });
+    // Keep reasonable history stack size
+    if (state.history.length > 30) state.history.shift();
+  }
+  state.view = view;
+  state.params = params;
+  window.scrollTo({top:0, behavior:'instant'});
+  render();
+}
+
+function goBack() {
+  if (state.history.length > 0) {
+    const prev = state.history.pop();
+    state.view = prev.view;
+    state.params = prev.params || {};
+    state.role = prev.role;
+    window.scrollTo({top:0, behavior:'instant'});
+    render();
+    toast('Returned to previous page');
+  } else {
+    // Sensible fallback
+    if (state.role === 'student') go('student-dashboard', {}, true);
+    else if (state.role === 'organizer') go('organizer-dashboard', {}, true);
+    else if (state.role === 'admin') go('admin-dashboard', {}, true);
+    else go('landing', {}, true);
+  }
+}
+
+function toast(msg, iconSvg='check') {
+  const host = document.getElementById('toastHost');
+  if(!host) return;
+  const el = document.createElement('div');
+  el.className='toast';
+  el.innerHTML = `<span style="color:var(--cyan);display:flex;align-items:center;">${ic(iconSvg,16)}</span><span>${msg}</span>`;
+  host.appendChild(el);
+  setTimeout(()=>{
+    el.style.transition='opacity .25s ease, transform .25s ease';
+    el.style.opacity='0';
+    el.style.transform='translateY(6px)';
+    setTimeout(()=>el.remove(), 250);
+  }, 2600);
+}
+
+function catInfo(id){ return CATEGORIES.find(c=>c.id===id) || CATEGORIES[0]; }
+function getReg(eventId){ return registrations.find(r=>r.eventId===eventId); }
+function pct(a,b){ return b > 0 ? Math.round((a/b)*100) : 0; }
+
+/* =========================================================
+   RENDER ROOT
+========================================================= */
+function render(){
+  const root = document.getElementById('root');
+  if(!state.role){
+    if(state.view==='login') root.innerHTML = viewLogin();
+    else root.innerHTML = viewLanding();
+  } else {
+    root.innerHTML = viewShell();
+  }
+  afterRender();
+}
+
+let _charts = {};
+function afterRender(){
+  if(state.view==='organizer-analytics') drawAnalyticsCharts();
+  if(state.view==='admin-dashboard') drawAdminCharts();
+  if(state.view==='admin-analytics') drawAdminDeptChart();
+}
+
+function drawAdminDeptChart(){
+  Object.values(_charts).forEach(c=>c && c.destroy());
+  const ctx = document.getElementById('adminDeptChart');
+  if(ctx) _charts.deptAdmin = new Chart(ctx, {type:'bar', data:{labels:DEPARTMENTS, datasets:[{data:[220,95,65,150,110],backgroundColor:'#4F3DF5',borderRadius:6}]}, options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#EEECFB'}},x:{grid:{display:false}}}}});
+}
+
+/* =========================================================
+   PUBLIC TOPNAV (With Go-Back Button)
+========================================================= */
+function publicNav(){
+  const hasHistory = canGoBack();
+  return `
+  <div class="topnav">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:14px 32px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        ${hasHistory ? `
+          <button class="nav-back-btn" onclick="goBack()" title="Back to previous page">
+            ${ic('arrowLeft', 15)} <span>Back</span>
+          </button>
+        ` : ''}
+        <div class="logo" onclick="go('landing')" style="cursor:pointer;">
+          <div class="logo-mark">${ic('spark',18)}</div>
+          CampusBuzz
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:12.5px;color:var(--muted);display:none;" class="date-badge-desktop">${getTodayFormatted()}</span>
+        <button onclick="go('explore')" class="btn btn-ghost btn-sm">Explore</button>
+        <button onclick="go('login')" class="btn btn-outline btn-sm">Log in</button>
+        <button onclick="go('login')" class="btn btn-primary btn-sm">Get started</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   LANDING PAGE
+========================================================= */
+function viewLanding(){
+  const upcoming = events.filter(e=>e.status==='published').slice(0,3);
+  return `
+  ${publicNav()}
+  <section style="position:relative;overflow:hidden;padding:76px 0 60px;background:radial-gradient(1200px 600px at 80% -10%, #EFEBFF 0%, transparent 60%);">
+    <div class="container" style="display:grid;grid-template-columns:1.15fr 0.85fr;gap:52px;align-items:center;">
+      <div class="fade-in">
+        <div class="badge badge-indigo" style="margin-bottom:20px;">
+          ${ic('spark',13)} Real-Time Campus Event Hub &bull; ${getTodayFormatted()}
+        </div>
+        <h1 style="font-size:54px;line-height:1.06;letter-spacing:-0.025em;margin:0 0 20px;font-weight:700;">
+          Your campus.<br>Your events.<br><span class="grad-text">One buzz.</span>
+        </h1>
+        <p style="font-size:16.5px;line-height:1.6;color:var(--muted);max-width:480px;margin-bottom:30px;">
+          Discover updated events every day, register in a tap, check in with an instant QR scan, and earn accredited certificates — built specifically for our university.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <button onclick="go('login',{role:'student'})" class="btn btn-primary">Student Portal</button>
+          <button onclick="go('login',{role:'organizer'})" class="btn btn-outline">Organizer Access</button>
+          <button onclick="go('login',{role:'admin'})" class="btn btn-ghost btn-sm">Admin View</button>
+        </div>
+        <div style="display:flex;gap:32px;margin-top:40px;">
+          <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;">15+</div><div style="font-size:12.5px;color:var(--muted-2);">Active Events</div></div>
+          <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;">850+</div><div style="font-size:12.5px;color:var(--muted-2);">Campus Attendees</div></div>
+          <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;">94%</div><div style="font-size:12.5px;color:var(--muted-2);">Turnout Rate</div></div>
+        </div>
+      </div>
+      <div class="fade-in" style="position:relative;height:400px;">
+        ${pulseVisual()}
+      </div>
+    </div>
+  </section>
+
+  <!-- Happening Soon -->
+  <section class="container" style="padding:60px 0 16px;">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;">
+      <div>
+        <h2 style="font-size:26px;margin:0 0 6px;font-weight:700;">Happening soon</h2>
+        <p style="color:var(--muted);margin:0;font-size:14px;">Events happening today and upcoming this week.</p>
+      </div>
+      <button onclick="go('login',{role:'student'})" class="btn btn-ghost btn-sm">View all ${ic('chevR',14)}</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      ${upcoming.map(e=>eventCardPublic(e)).join('')}
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="container" style="padding:64px 0 16px;">
+    <h2 style="font-size:26px;margin:0 0 6px;font-weight:700;">Browse by category</h2>
+    <p style="color:var(--muted);margin:0 0 26px;font-size:14px;">Explore verified activities across clubs and academics.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      ${CATEGORIES.map(c=>`
+        <div class="card hover-lift" style="padding:22px;cursor:pointer;" onclick="go('login',{role:'student'})">
+          <div style="width:42px;height:42px;border-radius:12px;background:${c.color}15;color:${c.color};display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+            ${ic(c.iconName, 22)}
+          </div>
+          <div style="font-weight:600;font-size:15px;">${c.name}</div>
+          <div style="font-size:12.5px;color:var(--muted-2);margin-top:4px;">${events.filter(e=>e.category===c.id && e.status==='published').length} active events</div>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <!-- Lifecycle -->
+  <section class="container" style="padding:64px 0 16px;">
+    <h2 style="font-size:26px;margin:0 0 34px;font-weight:700;">From proposal to verified certificate</h2>
+    ${lifecycleStrip()}
+  </section>
+
+  <!-- How It Works Steps -->
+  <section class="container" style="padding:60px 0 16px;">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      ${howItWorksStep('1','Discover','Filter by dates, department, and category to find sessions you care about.')}
+      ${howItWorksStep('2','Register','One-tap registration locks in your verified seat instantly.')}
+      ${howItWorksStep('3','Attend','Walk into the venue and scan the entrance QR code for instant check-in.')}
+      ${howItWorksStep('4','Certify','Download your verified certificate with accreditation hash immediately.')}
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="container" style="padding:64px 0 24px;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+      ${featureCard('search','Smart Discovery','Filter by department, category, or date to find high-impact campus events.')}
+      ${featureCard('ticket','Instant Registration','Real-time seat locking with immediate notifications and schedule sync.')}
+      ${featureCard('qr','Contactless QR Check-In','Automated attendance verification at the entrance in seconds.')}
+      ${featureCard('award','Accredited Certificates','Official downloadable certificates unlocked automatically after attendance.')}
+      ${featureCard('bell','Live Campus Updates','Direct alerts for venue updates, timing changes, and speaker schedules.')}
+      ${featureCard('chart','Organizer Analytics','Detailed registration ratios, capacity metrics, and post-session ratings.')}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding:80px 0;margin-top:60px;background:var(--ink);color:#fff;">
+    <div class="container" style="text-align:center;">
+      <h2 style="font-size:32px;margin:0 0 12px;font-weight:700;">Ready to elevate your campus experience?</h2>
+      <p style="color:#A9A5D6;margin:0 0 28px;font-size:15px;max-width:540px;margin-left:auto;margin-right:auto;">
+        Log in as Student (Anushka Sugandhi), Organizer (Dr. Meera Rao), or Administrator to explore the complete workflow.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button onclick="go('login',{role:'student'})" class="btn btn-primary">Student Login</button>
+        <button onclick="go('login',{role:'organizer'})" class="btn" style="background:#fff;color:var(--ink);">Organizer Portal</button>
+        <button onclick="go('login',{role:'admin'})" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.25);">Admin Portal</button>
+      </div>
+    </div>
+  </section>
+
+  <footer style="padding:32px 0;background:#fff;border-top:1px solid var(--line);">
+    <div class="container" style="display:flex;justify-content:space-between;align-items:center;color:var(--muted-2);font-size:13px;flex-wrap:wrap;gap:12px;">
+      <div class="logo" style="font-size:15px;">
+        <div class="logo-mark" style="width:24px;height:24px;">${ic('spark',12)}</div>
+        CampusBuzz
+      </div>
+      <div>Campus Event & Accreditation Management System &bull; Active Date: ${getTodayFormatted()}</div>
+    </div>
+  </footer>
+  `;
+}
+
+function pulseVisual(){
+  const nodes = [
+    {label:'Discover Events', y:40, icon:'compass'},
+    {label:'Register Seat', y:150, icon:'ticket'},
+    {label:'QR Check-In', y:260, icon:'qr'},
+    {label:'Get Certificate', y:370, icon:'award'},
+  ];
+  return `
+  <div style="position:relative;height:100%;">
+    <svg width="100%" height="100%" viewBox="0 0 320 420" style="position:absolute;inset:0;overflow:visible;">
+      <path d="M60 40 C 180 40, 20 150, 160 150 S 300 260, 140 260 S 60 370, 220 370" stroke="url(#g1)" stroke-width="2.5" fill="none" stroke-dasharray="4 6" opacity="0.5"/>
+      <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4F3DF5"/><stop offset="100%" stop-color="#17B6C2"/></linearGradient></defs>
+    </svg>
+    ${nodes.map((n,i)=>`
+      <div style="position:absolute; ${i%2===0?'left:6%':'right:6%'}; top:${n.y}px; display:flex; align-items:center; gap:10px; ${i%2!==0?'flex-direction:row-reverse;':''}">
+        <div style="width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#4F3DF5,#17B6C2);box-shadow:0 0 0 6px rgba(79,61,245,0.12);" class="pulse-dot"></div>
+        <div class="card" style="padding:9px 15px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;box-shadow:var(--shadow);">
+          <span style="color:var(--indigo);display:flex;">${ic(n.icon,14)}</span>
+          ${n.label}
+        </div>
+      </div>`).join('')}
+    <div class="card" style="position:absolute;bottom:0px;left:20px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-lg);">
+      <div style="width:34px;height:34px;border-radius:9px;background:#EEEBFE;color:var(--indigo);display:flex;align-items:center;justify-content:center;">
+        ${ic('award',18)}
+      </div>
+      <div>
+        <div style="font-weight:600;font-size:13px;">Certificate Ready</div>
+        <div style="font-size:11.5px;color:var(--muted-2);">Anushka Sugandhi &bull; Verified</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function lifecycleStrip(){
+  const steps=['Created','Approved','Published','Registered','Checked-In','Feedback','Certified'];
+  return `<div style="display:flex;align-items:center;overflow-x:auto;padding-bottom:8px;">
+    ${steps.map((s,i)=>`
+      <div style="display:flex;align-items:center;flex-shrink:0;">
+        <div style="text-align:center;">
+          <div style="width:58px;height:58px;border-radius:50%;background:${i===steps.length-1?'linear-gradient(135deg,#EAB308,#FF6B4A)':'#EEEBFE'};display:flex;align-items:center;justify-content:center;font-weight:700;color:${i===steps.length-1?'#fff':'var(--indigo-deep)'};font-family:'Space Grotesk';margin:0 auto 10px;font-size:16px;">${i+1}</div>
+          <div style="font-size:13px;font-weight:600;width:92px;">${s}</div>
+        </div>
+        ${i<steps.length-1?`<div style="width:48px;height:2px;background:var(--line);margin:0 4px 30px;flex-shrink:0;"></div>`:''}
+      </div>`).join('')}
+  </div>`;
+}
+
+function howItWorksStep(n,title,desc){
+  return `<div class="card card-pad hover-lift">
+    <div style="font-family:'Space Grotesk';font-weight:700;font-size:22px;color:var(--indigo);margin-bottom:12px;">0${n}</div>
+    <div style="font-weight:600;font-size:15.5px;margin-bottom:6px;">${title}</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.5;">${desc}</div>
+  </div>`;
+}
+
+function featureCard(iconName,title,desc){
+  return `<div class="card card-pad hover-lift">
+    <div style="width:40px;height:40px;border-radius:10px;background:#EEEBFE;color:var(--indigo);display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+      ${ic(iconName,20)}
+    </div>
+    <div style="font-weight:600;font-size:15.5px;margin-bottom:6px;">${title}</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.5;">${desc}</div>
+  </div>`;
+}
+
+function eventCardPublic(e){
+  const c = catInfo(e.category);
+  const p = pct(e.registered,e.capacity);
+  const status = p>=100?'CLOSED':p>=85?'ALMOST FULL':'OPEN';
+  const statusColor = status==='CLOSED'?'badge-red':status==='ALMOST FULL'?'badge-yellow':'badge-green';
+  return `
+  <div class="card hover-lift" style="overflow:hidden;cursor:pointer;" onclick="go('login',{role:'student'})">
+    <div style="height:120px;background:${e.img};position:relative;">
+      <div style="position:absolute;top:12px;left:12px;" class="badge" style="background:rgba(255,255,255,0.92);color:${c.color};">
+        <span style="display:flex;">${ic(c.iconName,12)}</span> ${c.name}
+      </div>
+    </div>
+    <div style="padding:18px;">
+      <div style="font-weight:600;font-size:15px;margin-bottom:8px;line-height:1.3;">${e.title}</div>
+      <div style="font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:5px;margin-bottom:14px;">
+        <div>${ic('cal',13)} &nbsp;${fmtDate(e.date, true)}</div>
+        <div>${ic('pin',13)} &nbsp;${e.venue}</div>
+        <div>${ic('users',13)} &nbsp;${e.registered}/${e.capacity} registered</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="badge ${statusColor}">${status}</span>
+        <span class="btn btn-ghost btn-sm" style="padding:4px 8px;font-size:12px;">View &rarr;</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   AUTHENTICATION: 3 ROLES (Student Anushka, Organizer, Admin)
+========================================================= */
+function viewLogin(){
+  const preselect = state.params.role || 'student';
+  return `
+  <div class="topnav">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:14px 32px;">
+      <button class="nav-back-btn" onclick="goBack()" title="Back to previous page">
+        ${ic('arrowLeft', 15)} <span>Back</span>
+      </button>
+      <div class="logo" onclick="go('landing')" style="cursor:pointer;">
+        <div class="logo-mark">${ic('spark',18)}</div>
+        CampusBuzz
+      </div>
+      <div style="width:70px;"></div>
+    </div>
+  </div>
+  <div style="min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:40px 20px;">
+    <div class="card card-pad fade-in" style="width:100%;max-width:440px;padding:34px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div class="logo-mark" style="margin:0 auto 14px;width:44px;height:44px;">${ic('spark',20)}</div>
+        <h2 style="margin:0 0 6px;font-size:22px;">Sign in to CampusBuzz</h2>
+        <p style="color:var(--muted);font-size:13.5px;margin:0;">Select one of the 3 portals to continue:</p>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;">
+        ${loginRoleBtn('student','academic','Student Portal — Anushka Sugandhi','Register for events, check in via QR, download certificates')}
+        ${loginRoleBtn('organizer','user','Organizer Portal — Dr. Meera Rao','Submit events, track registrations, verify attendance')}
+        ${loginRoleBtn('admin','shield','Administrator Portal — College Admin','Approve events, oversee venues, monitor campus metrics')}
+      </div>
+
+      <div class="divider" style="margin-bottom:18px;"></div>
+      <div class="field" style="margin-bottom:12px;">
+        <label>Selected Email</label>
+        <input type="text" id="loginEmail" readonly value="${
+          preselect==='student'?'anushka.Sugandhi@campusbuzz.edu':
+          preselect==='organizer'?'meera.rao@campusbuzz.edu':
+          'admin@campusbuzz.edu'
+        }">
+      </div>
+      <div class="field" style="margin-bottom:16px;">
+        <label>Security Key</label>
+        <input type="password" value="••••••••••••" readonly>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="doLogin('${preselect}')">
+        Enter as ${roleLabel(preselect)}
+      </button>
+      <p style="text-align:center;font-size:12px;color:var(--muted-2);margin-top:14px;">
+        Click any role above to switch portals immediately.
+      </p>
+    </div>
+  </div>`;
+}
+
+function roleLabel(r){return r==='student'?'Student':r==='organizer'?'Organizer':'Admin';}
+
+function loginRoleBtn(role, iconName, title, sub){
+  const active = (state.params.role||'student')===role;
+  return `<div onclick="state.params.role='${role}';render();" class="card" style="padding:13px 15px;cursor:pointer;display:flex;align-items:center;gap:12px;border-color:${active?'var(--indigo)':'var(--line)'};background:${active?'#F6F4FF':'#fff'};transition:all .15s;">
+    <div style="width:38px;height:38px;border-radius:10px;background:${active?'var(--indigo)':'#EEEBFE'};color:${active?'#fff':'var(--indigo)'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      ${ic(iconName,18)}
+    </div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:600;font-size:13.5px;color:var(--ink);">${title}</div>
+      <div style="font-size:11.5px;color:var(--muted-2);line-height:1.3;margin-top:2px;">${sub}</div>
+    </div>
+    ${active?`<div style="color:var(--indigo);display:flex;">${ic('check',16)}</div>`:''}
+  </div>`;
+}
+
+function doLogin(fallback){
+  const role = state.params.role || fallback;
+  state.role = role;
+  state.params = {};
+  if(role==='student') go('student-dashboard');
+  else if(role==='organizer') go('organizer-dashboard');
+  else go('admin-dashboard');
+  toast('Signed in as '+roleLabel(role));
+}
+
+function logout(){
+  state.role = null;
+  state.history = [];
+  go('landing');
+  toast('Logged out successfully');
+}
+
+/* =========================================================
+   APP SHELL (POST-LOGIN)
+========================================================= */
+function viewShell(){
+  return `
+  <div class="shell">
+    ${sidebar()}
+    <div class="main-area">
+      ${topbar()}
+      <div class="content fade-in">
+        ${routeContent()}
+      </div>
+    </div>
+  </div>
+  ${bottomNav()}
+  `;
+}
+
+function sidebar(){
+  const links = {
+    student: [
+      ['student-dashboard','home','Dashboard'],
+      ['explore','compass','Explore Events'],
+      ['my-events','ticket','My Events'],
+      ['certificates','award','Certificates'],
+      ['notifications','bell','Notifications'],
+      ['profile','user','Profile'],
+    ],
+    organizer: [
+      ['organizer-dashboard','home','Dashboard'],
+      ['organizer-events','ticket','My Events'],
+      ['create-event','plus','Create Event'],
+      ['approvals-status','check','Approval Status'],
+      ['attendance','qr','Attendance'],
+      ['organizer-analytics','chart','Analytics'],
+      ['profile','user','Profile'],
+    ],
+    admin: [
+      ['admin-dashboard','home','Dashboard'],
+      ['admin-approvals','check','Approvals'],
+      ['admin-users','users','Users'],
+      ['admin-departments','bldg','Departments'],
+      ['admin-venues','layers','Venues'],
+      ['admin-analytics','chart','Analytics'],
+      ['profile','user','Profile'],
+    ]
+  };
+  const items = links[state.role] || [];
+  return `
+  <div class="sidebar">
+    <div class="logo" style="color:#fff;padding:6px 8px 24px;cursor:pointer;" onclick="go('landing')">
+      <div class="logo-mark">${ic('spark',18)}</div>CampusBuzz
+    </div>
+
+    <!-- Quick Role Switcher Inside Sidebar -->
+    <div style="background:rgba(255,255,255,0.06);border-radius:12px;padding:10px;margin-bottom:18px;">
+      <div style="font-size:11px;color:#8F8BB8;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:8px;">Switch Portal</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div onclick="switchRole('student')" class="sidebar-link ${state.role==='student'?'active':''}" style="padding:7px 10px;font-size:13px;margin:0;">
+          <span class="ic">${ic('academic',14)}</span> Student
+        </div>
+        <div onclick="switchRole('organizer')" class="sidebar-link ${state.role==='organizer'?'active':''}" style="padding:7px 10px;font-size:13px;margin:0;">
+          <span class="ic">${ic('user',14)}</span> Organizer
+        </div>
+        <div onclick="switchRole('admin')" class="sidebar-link ${state.role==='admin'?'active':''}" style="padding:7px 10px;font-size:13px;margin:0;">
+          <span class="ic">${ic('shield',14)}</span> Admin
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;">
+      <div style="font-size:11px;color:#8F8BB8;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;margin-bottom:8px;padding-left:12px;">Navigation</div>
+      ${items.map(([view,icon,label])=>`
+        <div class="sidebar-link ${state.view===view?'active':''}" onclick="go('${view}')">
+          <span class="ic">${ic(icon,16)}</span>${label}
+        </div>`).join('')}
+    </div>
+
+    <div class="divider" style="background:rgba(255,255,255,0.1);margin:12px 0;"></div>
+    <div class="sidebar-link" onclick="logout()">
+      <span class="ic">${ic('logout',16)}</span>Log out
+    </div>
+  </div>`;
+}
+
+function switchRole(newRole){
+  state.role = newRole;
+  state.params = {};
+  if(newRole==='student') go('student-dashboard');
+  else if(newRole==='organizer') go('organizer-dashboard');
+  else go('admin-dashboard');
+  toast('Switched to '+roleLabel(newRole)+' portal');
+}
+
+function bottomNav(){
+  const links = {
+    student: [['student-dashboard','home','Home'],['explore','compass','Explore'],['my-events','ticket','Events'],['certificates','award','Certs'],['profile','user','Profile']],
+    organizer: [['organizer-dashboard','home','Home'],['organizer-events','ticket','Events'],['create-event','plus','Create'],['attendance','qr','Scan'],['organizer-analytics','chart','Stats']],
+    admin: [['admin-dashboard','home','Home'],['admin-approvals','check','Approve'],['admin-users','users','Users'],['admin-analytics','chart','Stats']],
+  };
+  const items = links[state.role]||[];
+  return `<div class="bottomnav">${items.map(([view,icon,label])=>`
+    <div class="bn-item ${state.view===view?'active':''}" onclick="go('${view}')">${ic(icon,18)}<span>${label}</span></div>`).join('')}</div>`;
+}
+
+function topbar(){
+  const name = state.role==='student'?CURRENT_STUDENT.name:state.role==='organizer'?CURRENT_ORGANIZER.name:CURRENT_ADMIN.name;
+  const sub = state.role==='student'?CURRENT_STUDENT.dept:state.role==='organizer'?CURRENT_ORGANIZER.club:CURRENT_ADMIN.role;
+  const unread = notifications.filter(n=>n.unread).length;
+  const initials = name.split(' ').map(n=>n[0]).join('').slice(0,2);
+  const hasHistory = canGoBack();
+
+  return `
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;flex:1;max-width:540px;">
+      <!-- Going Back Navigation Symbol -->
+      <button class="nav-back-btn" onclick="goBack()" title="Go back to previous screen">
+        ${ic('arrowLeft', 16)} <span>Back</span>
+      </button>
+
+      <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:8px 14px;color:var(--muted-2);flex:1;">
+        ${ic('search',15)}
+        <input type="text" placeholder="Search events, venues, topics…" onkeydown="if(event.key==='Enter'){exploreState.q=this.value;go('explore');}" style="border:none;outline:none;background:transparent;width:100%;font-size:13.5px;font-family:inherit;">
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:14px;">
+      <!-- Real-time dynamic date indicator -->
+      <div style="font-size:12.5px;color:var(--muted);background:#fff;border:1px solid var(--line);padding:6px 12px;border-radius:9px;display:flex;align-items:center;gap:6px;">
+        <span style="color:var(--indigo);display:flex;">${ic('cal',13)}</span>
+        <span>${fmtDate(getRelativeDate(0), false)}</span>
+      </div>
+
+      <div style="position:relative;cursor:pointer;color:var(--muted);padding:4px;" onclick="go('notifications')">
+        ${ic('bell',19)}
+        ${unread>0?`<span style="position:absolute;top:-2px;right:-2px;background:var(--red);color:#fff;font-size:10px;font-weight:700;border-radius:100px;padding:1px 5px;">${unread}</span>`:''}
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="go('profile')">
+        <div class="avatar">${initials}</div>
+        <div style="display:none;" class="profile-header-meta">
+          <div style="font-size:13px;font-weight:600;line-height:1.2;">${name}</div>
+          <div style="font-size:11px;color:var(--muted-2);">${sub}</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function routeContent(){
+  switch(state.view){
+    case 'student-dashboard': return studentDashboard();
+    case 'explore': return exploreEvents();
+    case 'event-detail': return eventDetail();
+    case 'my-events': return myEvents();
+    case 'certificates': return certificatesPage();
+    case 'certificate-view': return certificateView();
+    case 'notifications': return notificationsPage();
+    case 'profile': return profilePage();
+    case 'attendance-scan': return attendanceScan();
+
+    case 'organizer-dashboard': return organizerDashboard();
+    case 'organizer-events': return organizerEvents();
+    case 'create-event': return createEvent();
+    case 'approvals-status': return approvalsStatus();
+    case 'attendance': return organizerAttendance();
+    case 'organizer-analytics': return organizerAnalytics();
+
+    case 'admin-dashboard': return adminDashboard();
+    case 'admin-approvals': return adminApprovals();
+    case 'admin-users': return adminUsers();
+    case 'admin-departments': return adminDepartments();
+    case 'admin-venues': return adminVenues();
+    case 'admin-analytics': return adminAnalyticsPage();
+
+    default: return studentDashboard();
+  }
+}
+
+/* =========================================================
+   STUDENT: DASHBOARD (Anushka Sugandhi)
+========================================================= */
+function studentDashboard(){
+  const myRegs = registrations.map(r=>({...r, event:events.find(e=>e.id===r.eventId)})).filter(r=>r.event);
+  const upcoming = myRegs.filter(r=>new Date(r.event.date) >= new Date(getRelativeDate(0)) && !r.attended);
+  const attended = myRegs.filter(r=>r.attended);
+  const certs = myRegs.filter(r=>r.certIssued);
+  const recommended = events.filter(e=>e.status==='published' && CURRENT_STUDENT.interests.includes(e.category) && !getReg(e.id)).slice(0,3);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="font-size:25px;margin:0 0 4px;font-weight:700;">Good morning, ${CURRENT_STUDENT.name.split(' ')[0]}</h1>
+      <p style="color:var(--muted);margin:0;font-size:14px;">Here is your campus schedule and live events for ${getTodayFormatted()}.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="go('explore')" class="btn btn-primary btn-sm">${ic('compass',14)} Explore Events</button>
+      <button onclick="go('my-events')" class="btn btn-outline btn-sm">${ic('ticket',14)} My Passes</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;">
+    ${kpiCard('Registered Events', myRegs.length, ic('ticket',18), '#4F3DF5')}
+    ${kpiCard('Upcoming', upcoming.length, ic('cal',18), '#17B6C2')}
+    ${kpiCard('Attended Sessions', attended.length, ic('check',18), '#16A34A')}
+    ${kpiCard('Earned Certificates', certs.length, ic('award',18), '#EAB308')}
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start;">
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="margin:0;font-size:16.5px;">Your Registered Events</h3>
+        <button onclick="go('my-events')" class="btn btn-ghost btn-sm">View all ${ic('chevR',13)}</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
+        ${upcoming.length ? upcoming.map(r=>upcomingRow(r.event)).join('') : emptyState('No upcoming sessions','Browse the campus calendar to reserve your seat.','explore','Explore Events')}
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <h3 style="margin:0;font-size:16.5px;">Recommended For Your Major</h3>
+        <span style="font-size:12.5px;color:var(--muted-2);">${CURRENT_STUDENT.dept}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+        ${recommended.map(e=>eventCardCompact(e)).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div class="card card-pad" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h3 style="margin:0;font-size:15.5px;">Today's Campus Schedule</h3>
+          <span class="badge badge-indigo" style="font-size:11px;">Active Day</span>
+        </div>
+        ${timelineItem('9:00 AM - 1:00 PM', 'Future of Data Analytics Workshop', 'Seminar Hall A &bull; In Progress')}
+        ${timelineItem('1:30 PM - 2:30 PM', 'Student Research Council Meeting', 'Innovation Lab')}
+        ${timelineItem('3:00 PM - 4:30 PM', 'AI Summit Project Submission Prep', 'Tech Park Lab 2', true)}
+      </div>
+
+      <div class="card card-pad">
+        <h3 style="margin:0 0 14px;font-size:15.5px;">Recent Activity</h3>
+        ${activityLog.map(a=>`
+          <div style="display:flex;gap:10px;padding:8px 0;font-size:13px;align-items:flex-start;">
+            <span style="color:var(--green);margin-top:2px;display:flex;">${ic('check',13)}</span>
+            <div style="flex:1;">
+              <div style="font-weight:500;">${a.text}</div>
+              <div style="color:var(--muted-2);font-size:11.5px;margin-top:2px;">${a.time}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function kpiCard(label,val,icon,color){
+  return `<div class="card card-pad hover-lift">
+    <div style="display:flex;justify-content:space-between;align-items:start;">
+      <div>
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:6px;">${label}</div>
+        <div style="font-family:'Space Grotesk';font-size:27px;font-weight:700;">${val}</div>
+      </div>
+      <div style="width:38px;height:38px;border-radius:10px;background:${color}15;color:${color};display:flex;align-items:center;justify-content:center;">${icon}</div>
+    </div>
+  </div>`;
+}
+
+function upcomingRow(e){
+  const c = catInfo(e.category);
+  return `<div class="card hover-lift" style="padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;" onclick="go('event-detail',{id:'${e.id}'})">
+    <div style="width:44px;height:44px;border-radius:10px;background:${e.img};flex-shrink:0;"></div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:600;font-size:14.5px;">${e.title}</div>
+      <div style="font-size:12.5px;color:var(--muted-2);">${fmtDate(e.date, true)} &bull; ${e.start} &bull; ${e.venue}</div>
+    </div>
+    <span class="badge badge-indigo">
+      <span style="display:flex;">${ic(c.iconName,12)}</span> ${c.name}
+    </span>
+  </div>`;
+}
+
+function timelineItem(time,title,venue,last){
+  return `<div style="display:flex;gap:12px;">
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--indigo);"></div>
+      ${!last?'<div style="width:2px;flex:1;background:var(--line);"></div>':''}
+    </div>
+    <div style="padding-bottom:18px;">
+      <div style="font-size:11.5px;color:var(--muted-2);font-weight:600;">${time}</div>
+      <div style="font-size:13.5px;font-weight:600;margin:2px 0;">${title}</div>
+      <div style="font-size:12px;color:var(--muted);">${venue}</div>
+    </div>
+  </div>`;
+}
+
+function eventCardCompact(e){
+  const c = catInfo(e.category);
+  return `<div class="card hover-lift" style="overflow:hidden;cursor:pointer;" onclick="go('event-detail',{id:'${e.id}'})">
+    <div style="height:76px;background:${e.img};"></div>
+    <div style="padding:12px;">
+      <div style="font-size:11px;color:${c.color};font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:4px;">
+        <span style="display:flex;">${ic(c.iconName,11)}</span> ${c.name}
+      </div>
+      <div style="font-weight:600;font-size:13px;line-height:1.3;">${e.title}</div>
+      <div style="font-size:11.5px;color:var(--muted-2);margin-top:5px;">${fmtDate(e.date, true)}</div>
+    </div>
+  </div>`;
+}
+
+function emptyState(title,sub,view,cta){
+  return `<div class="card" style="padding:36px 20px;text-align:center;">
+    <div style="width:44px;height:44px;border-radius:12px;background:#EEEBFE;color:var(--indigo);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+      ${ic('inbox',22)}
+    </div>
+    <div style="font-weight:600;font-size:14.5px;margin-bottom:4px;">${title}</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">${sub}</div>
+    <button onclick="go('${view}')" class="btn btn-primary btn-sm">${cta}</button>
+  </div>`;
+}
+
+/* =========================================================
+   STUDENT: EXPLORE EVENTS
+========================================================= */
+let exploreState = {q:'', cat:'all', sort:'upcoming'};
+
+function exploreEvents(){
+  let list = events.filter(e=>e.status==='published');
+  if(exploreState.cat!=='all') list = list.filter(e=>e.category===exploreState.cat);
+  if(exploreState.q) list = list.filter(e=>e.title.toLowerCase().includes(exploreState.q.toLowerCase()) || e.dept.toLowerCase().includes(exploreState.q.toLowerCase()));
+  if(exploreState.sort==='popular') list = list.sort((a,b)=>b.registered-a.registered);
+  else if(exploreState.sort==='closing') list = list.sort((a,b)=>new Date(a.deadline)-new Date(b.deadline));
+  else list = list.sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Explore Events</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+  <p style="color:var(--muted);margin:0 0 20px;font-size:14px;">${list.length} upcoming events verified across campus departments.</p>
+
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 14px;">
+      ${ic('search',15)}
+      <input oninput="exploreState.q=this.value;rerenderRoute()" value="${exploreState.q}" placeholder="Filter by event title, department, speaker…" style="border:none;outline:none;flex:1;font-size:13.5px;font-family:inherit;">
+    </div>
+    <select onchange="exploreState.sort=this.value;rerenderRoute()" style="border:1px solid var(--line);border-radius:11px;padding:9px 14px;font-family:inherit;background:#fff;font-size:13.5px;">
+      <option value="upcoming" ${exploreState.sort==='upcoming'?'selected':''}>Upcoming by date</option>
+      <option value="popular" ${exploreState.sort==='popular'?'selected':''}>Most registered</option>
+      <option value="closing" ${exploreState.sort==='closing'?'selected':''}>Registration closing soon</option>
+    </select>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;">
+    ${chip('all','All Events', exploreState.cat==='all')}
+    ${CATEGORIES.map(c=>chip(c.id, c.name, exploreState.cat===c.id, c.iconName)).join('')}
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+    ${list.map(e=>eventCardFull(e)).join('')}
+  </div>
+  ${list.length===0?emptyState('No matching events found','Try resetting your filters or clearing search terms.','explore','Reset Filters'):''}
+  `;
+}
+
+function chip(val,label,active,iconName){
+  return `<div onclick="exploreState.cat='${val}';rerenderRoute()" class="badge ${active?'badge-indigo':'badge-grey'}" style="cursor:pointer;padding:7px 13px;display:flex;align-items:center;gap:5px;">
+    ${iconName ? `<span style="display:flex;">${ic(iconName,13)}</span>`:''}
+    <span>${label}</span>
+  </div>`;
+}
+
+function rerenderRoute(){
+  const c = document.querySelector('.content');
+  if(c){
+    c.innerHTML = routeContent();
+    afterRender();
+  }
+}
+
+function eventCardFull(e){
+  const c = catInfo(e.category);
+  const p = pct(e.registered,e.capacity);
+  const status = p>=100?'CLOSED':p>=85?'ALMOST FULL':'OPEN';
+  const statusColor = status==='CLOSED'?'badge-red':status==='ALMOST FULL'?'badge-yellow':'badge-green';
+  const reg = getReg(e.id);
+  return `
+  <div class="card hover-lift" style="overflow:hidden;">
+    <div style="height:124px;background:${e.img};position:relative;cursor:pointer;" onclick="go('event-detail',{id:'${e.id}'})">
+      <div class="badge" style="position:absolute;top:10px;left:10px;background:rgba(255,255,255,0.92);color:${c.color};">
+        <span style="display:flex;">${ic(c.iconName,12)}</span> ${c.name}
+      </div>
+    </div>
+    <div style="padding:16px;">
+      <div style="font-weight:600;font-size:15px;margin-bottom:6px;cursor:pointer;line-height:1.3;" onclick="go('event-detail',{id:'${e.id}'})">${e.title}</div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;display:flex;flex-direction:column;gap:5px;">
+        <div>${ic('cal',13)} &nbsp;${fmtDate(e.date, true)} &bull; ${e.start}</div>
+        <div>${ic('pin',13)} &nbsp;${e.venue}</div>
+        <div>${ic('users',13)} &nbsp;${e.registered}/${e.capacity} participants</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="badge ${statusColor}">${status}</span>
+        ${reg?`<span class="badge badge-green">${ic('check',12)} Registered</span>`:
+          `<button class="btn btn-primary btn-sm" ${status==='CLOSED'?'disabled':''} onclick="event.stopPropagation();quickRegister('${e.id}')">Register now</button>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+function quickRegister(id){
+  const e = events.find(x=>x.id===id);
+  if(!e || getReg(id)) return;
+  e.registered++;
+  registrations.push({eventId:id, status:'confirmed'});
+  activityLog.unshift({text:'Registered for '+e.title, time:'Just now'});
+  notifications.unshift({id:'n'+Date.now(), icon:'check', text:'Registration confirmed for "'+e.title+'".', time:'Just now', unread:true});
+  toast('Registered for '+e.title);
+  rerenderRoute();
+}
+
+/* =========================================================
+   STUDENT: EVENT DETAIL (With Back Symbol)
+========================================================= */
+function eventDetail(){
+  const e = events.find(x=>x.id===state.params.id);
+  if(!e) return `<div>Event not found. <button class="btn btn-outline btn-sm" onclick="goBack()">Back</button></div>`;
+  const c = catInfo(e.category);
+  const reg = getReg(e.id);
+  const p = pct(e.registered,e.capacity);
+
+  return `
+  <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+    <button class="nav-back-btn" onclick="goBack()">
+      ${ic('arrowLeft', 16)} <span>Back</span>
+    </button>
+    <div style="font-size:12.5px;color:var(--muted-2);">${e.dept} &bull; ${e.club}</div>
+  </div>
+
+  <div style="height:210px;border-radius:20px;background:${e.img};margin-bottom:24px;position:relative;">
+    <div class="badge" style="position:absolute;bottom:16px;left:20px;background:rgba(255,255,255,0.94);color:${c.color};">
+      <span style="display:flex;">${ic(c.iconName,13)}</span> ${c.name}
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:28px;align-items:start;">
+    <div>
+      <h1 style="font-size:26px;margin:0 0 10px;font-weight:700;">${e.title}</h1>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:13.5px;margin-bottom:22px;">
+        <span>${ic('cal',14)} ${fmtDate(e.date, true)}</span>
+        <span>${ic('clock',14)} ${e.start} – ${e.end}</span>
+        <span>${ic('pin',14)} ${e.venue}</span>
+        <span>${ic('users',14)} ${e.registered}/${e.capacity} registered</span>
+      </div>
+
+      <h3 style="font-size:16px;margin-bottom:10px;">About This Event</h3>
+      <p style="color:var(--ink-soft);line-height:1.7;font-size:14px;margin-bottom:24px;">${e.desc}</p>
+
+      <h3 style="font-size:16px;margin-bottom:12px;">Agenda & Timeline</h3>
+      <div class="card card-pad" style="margin-bottom:24px;">
+        ${e.schedule.map((s,i)=>timelineItem(s[0],s[1],'', i===e.schedule.length-1)).join('')}
+      </div>
+
+      ${e.speakers.length?`
+      <h3 style="font-size:16px;margin-bottom:12px;">Featured Speakers</h3>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px;">
+        ${e.speakers.map(s=>`
+          <div class="card card-pad" style="display:flex;gap:12px;align-items:center;">
+            <div class="avatar" style="background:linear-gradient(135deg,#8B5CF6,#17B6C2);">${s.name.split(' ').map(n=>n[0]).join('')}</div>
+            <div>
+              <div style="font-weight:600;font-size:14px;">${s.name}</div>
+              <div style="font-size:12px;color:var(--muted-2);">${s.role}</div>
+            </div>
+          </div>`).join('')}
+      </div>`:''}
+
+      <h3 style="font-size:16px;margin-bottom:12px;">Venue Details</h3>
+      <div class="card card-pad" style="display:flex;align-items:center;gap:16px;">
+        <div style="width:54px;height:54px;border-radius:12px;background:#EEEBFE;display:flex;align-items:center;justify-content:center;color:var(--indigo);flex-shrink:0;">
+          ${ic('bldg',24)}
+        </div>
+        <div>
+          <div style="font-weight:600;font-size:14.5px;">${e.venue}</div>
+          <div style="font-size:12.5px;color:var(--muted-2);">Max Seating: ${e.capacity} &bull; Organized by ${e.club} (${e.dept})</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar Action -->
+    <div class="card card-pad" style="position:sticky;top:84px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;">
+        <span style="color:var(--muted);">Seats Available</span><strong>${e.capacity-e.registered}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;">
+        <span style="color:var(--muted);">Registration Cutoff</span><strong>${fmtDate(e.deadline, true)}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:16px;">
+        <span style="color:var(--muted);">Access Type</span><strong>Free Campus Pass</strong>
+      </div>
+      <div style="height:7px;border-radius:6px;background:var(--line);margin-bottom:20px;overflow:hidden;">
+        <div style="height:100%;width:${p}%;background:linear-gradient(90deg,var(--indigo),var(--violet));"></div>
+      </div>
+      ${reg?`
+        <div class="badge badge-green" style="width:100%;justify-content:center;padding:11px;font-size:13.5px;margin-bottom:10px;">
+          ${ic('check',15)} You're Registered
+        </div>
+        <button class="btn btn-outline btn-block" onclick="go('my-events')">View My Passes</button>
+      `:`
+        <button class="btn btn-primary btn-block" onclick="quickRegister('${e.id}')" ${p>=100?'disabled':''}>
+          ${p>=100?'Capacity Reached':'Register For This Event'}
+        </button>
+      `}
+      <div style="margin-top:16px;font-size:12px;color:var(--muted-2);display:flex;align-items:center;gap:6px;">
+        ${ic('bell',13)} Real-time reminders sent automatically.
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   STUDENT: MY EVENTS
+========================================================= */
+function myEvents(){
+  const myRegs = registrations.map(r=>({...r, event:events.find(e=>e.id===r.eventId)})).filter(r=>r.event);
+  const upcoming = myRegs.filter(r=>!r.attended);
+  const past = myRegs.filter(r=>r.attended);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div>
+      <h1 style="font-size:25px;margin:0 0 4px;font-weight:700;">My Registered Events</h1>
+      <p style="color:var(--muted);font-size:13.5px;margin:0;">Active registrations and completed certificates for ${CURRENT_STUDENT.name}.</p>
+    </div>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',15)} <span>Back</span></button>
+  </div>
+
+  <h3 style="font-size:15px;margin-bottom:12px;">Active Upcoming Registrations</h3>
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:30px;">
+    ${upcoming.length?upcoming.map(r=>myEventRow(r)).join(''):emptyState('No active registrations','Discover events happening today or this week.','explore','Browse Calendar')}
+  </div>
+
+  <h3 style="font-size:15px;margin-bottom:12px;">Completed Sessions & Certificates</h3>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    ${past.length?past.map(r=>myEventRow(r)).join(''):emptyState('No past attendance yet','Check in at an event venue to unlock your certificate.','explore','Browse Events')}
+  </div>`;
+}
+
+function myEventRow(r){
+  const e = r.event;
+  return `<div class="card hover-lift" style="padding:15px 18px;display:flex;align-items:center;gap:16px;">
+    <div style="width:48px;height:48px;border-radius:11px;background:${e.img};flex-shrink:0;"></div>
+    <div style="flex:1;min-width:0;cursor:pointer;" onclick="go('event-detail',{id:'${e.id}'})">
+      <div style="font-weight:600;font-size:14.5px;">${e.title}</div>
+      <div style="font-size:12.5px;color:var(--muted-2);">${fmtDate(e.date, true)} &bull; ${e.venue}</div>
+    </div>
+    ${r.attended?`<span class="badge badge-green">${ic('check',12)} Attended</span>`:`<span class="badge badge-indigo">Confirmed</span>`}
+    ${!r.attended?`<button class="btn btn-outline btn-sm" onclick="go('attendance-scan',{id:'${e.id}'})">${ic('qr',14)} QR Check-In</button>`:''}
+    ${r.certIssued?`<button class="btn btn-primary btn-sm" onclick="go('certificate-view',{id:'${e.id}'})">${ic('award',14)} View Certificate</button>`:''}
+    ${!r.attended?`<button class="btn btn-danger btn-sm" onclick="cancelReg('${e.id}')">Cancel</button>`:''}
+  </div>`;
+}
+
+function cancelReg(id){
+  const e = events.find(x=>x.id===id);
+  registrations = registrations.filter(r=>r.eventId!==id);
+  if(e) e.registered = Math.max(0, e.registered-1);
+  toast('Registration cancelled', 'check');
+  rerenderRoute();
+}
+
+/* =========================================================
+   STUDENT: QR ATTENDANCE SCAN SIMULATION (With Back Symbol)
+========================================================= */
+function attendanceScan(){
+  const e = events.find(x=>x.id===state.params.id);
+  if(!e) return `<div>Event not found. <button class="btn btn-outline" onclick="goBack()">Back</button></div>`;
+  const reg = getReg(e.id);
+
+  return `
+  <div style="margin-bottom:14px;">
+    <button class="nav-back-btn" onclick="goBack()">
+      ${ic('arrowLeft',16)} <span>Back</span>
+    </button>
+  </div>
+  <div style="max-width:440px;margin:16px auto;text-align:center;" id="scanWrap">
+    <h2 style="margin:0 0 6px;font-size:22px;">${e.title}</h2>
+    <p style="color:var(--muted);margin:0 0 24px;font-size:13.5px;">Point your camera at the venue scanner or simulate check-in below.</p>
+    ${reg && reg.attended ? attendanceConfirmedBlock(e) : `
+    <div class="qr-box hover-lift">
+      <div style="text-align:center;">
+        <div style="color:var(--indigo);display:flex;justify-content:center;margin-bottom:8px;">${ic('qr',64)}</div>
+        <div style="font-size:12px;color:var(--muted-2);">Venue Entrance Scanner</div>
+        <div style="font-size:11px;color:var(--muted-2);margin-top:2px;">${e.venue}</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:24px;" onclick="simulateScan('${e.id}')">
+      ${ic('qr',16)} Simulate QR Check-In
+    </button>
+    `}
+  </div>`;
+}
+
+function attendanceConfirmedBlock(e){
+  const now = new Date();
+  return `
+  <div class="card card-pad fade-in" style="text-align:center;">
+    <div style="width:64px;height:64px;border-radius:50%;background:#DCFCE7;color:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      ${ic('check',32)}
+    </div>
+    <h3 style="margin:0 0 6px;font-size:20px;">Attendance Verified</h3>
+    <p style="color:var(--muted);margin:0 0 16px;font-size:13.5px;">
+      ${e.title}<br>Verified on ${fmtDate(e.date, true)} at ${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
+    </p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-primary btn-sm" onclick="go('certificate-view',{id:'${e.id}'})">View Certificate</button>
+      <button class="btn btn-outline btn-sm" onclick="go('my-events')">My Passes</button>
+    </div>
+  </div>`;
+}
+
+function simulateScan(id){
+  const wrap = document.getElementById('scanWrap');
+  wrap.innerHTML = `
+    <div style="padding:60px 0;">
+      <div class="sk" style="width:60px;height:60px;border-radius:50%;margin:0 auto;"></div>
+      <p style="color:var(--muted);margin-top:16px;font-size:13.5px;">Verifying student credentials with venue terminal…</p>
+    </div>`;
+  setTimeout(()=>{
+    const reg = getReg(id);
+    if(reg){
+      reg.attended = true;
+      reg.certIssued = true;
+    }
+    const e = events.find(x=>x.id===id);
+    activityLog.unshift({text:'Attended '+e.title, time:'Just now'});
+    notifications.unshift({id:'n'+Date.now(), icon:'award', text:'Certificate unlocked for '+e.title, time:'Just now', unread:true});
+    toast('Attendance confirmed & certificate ready!');
+    rerenderRoute();
+  }, 950);
+}
+
+/* =========================================================
+   STUDENT: CERTIFICATES & PRINT (Anushka Sugandhi)
+========================================================= */
+function certificatesPage(){
+  const certs = registrations.filter(r=>r.certIssued).map(r=>({...r,event:events.find(e=>e.id===r.eventId)}));
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div>
+      <h1 style="font-size:25px;margin:0 0 4px;font-weight:700;">My Certificates</h1>
+      <p style="color:var(--muted);font-size:13.5px;margin:0;">Verified credentials issued to ${CURRENT_STUDENT.name}.</p>
+    </div>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',15)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;">
+    ${certs.length? certs.map(c=>`
+      <div class="card hover-lift card-pad" style="text-align:center;cursor:pointer;" onclick="go('certificate-view',{id:'${c.event.id}'})">
+        <div style="width:48px;height:48px;border-radius:14px;background:#EEEBFE;color:var(--indigo);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          ${ic('award',24)}
+        </div>
+        <div style="font-weight:600;font-size:14.5px;margin-bottom:4px;">${c.event.title}</div>
+        <div style="font-size:12px;color:var(--muted-2);margin-bottom:16px;">Completed on ${fmtDate(c.event.date, false)}</div>
+        <button class="btn btn-outline btn-sm btn-block">${ic('award',14)} Open Certificate</button>
+      </div>`).join('') : emptyState('No certificates yet','Attend an event and complete verification to unlock accredited certificates.','explore','Browse Events') }
+  </div>`;
+}
+
+function certificateView(){
+  const e = events.find(x=>x.id===state.params.id) || events[0];
+  const certId = 'CB-2026-'+e.id.toUpperCase()+'-'+CURRENT_STUDENT.id;
+
+  return `
+  <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+    <button class="nav-back-btn" onclick="goBack()">
+      ${ic('arrowLeft', 16)} <span>Back</span>
+    </button>
+    <button class="btn btn-primary btn-sm" onclick="window.print()">
+      ${ic('download',14)} Download / Print Certificate
+    </button>
+  </div>
+
+  <div class="certificate" style="max-width:780px;margin:0 auto;" id="certPrint">
+    <div style="position:relative;z-index:1;">
+      <div style="font-size:12px;letter-spacing:0.12em;font-weight:700;color:var(--muted);margin-bottom:16px;text-transform:uppercase;">
+        Accredited Certificate of Participation
+      </div>
+      <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--indigo),var(--violet));color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 8px 20px -6px rgba(79,61,245,0.4);">
+        ${ic('award',28)}
+      </div>
+      <p style="color:var(--muted);margin:0 0 6px;font-size:13.5px;">This is proudly presented to</p>
+      
+      <!-- User's Correct Name: Anushka Sugandhi -->
+      <h2 style="font-size:34px;margin:0 0 16px;font-weight:700;color:var(--ink);">
+        ${CURRENT_STUDENT.name}
+      </h2>
+      
+      <p style="color:var(--muted);margin:0 0 6px;font-size:13.5px;">for active engagement and successful participation in</p>
+      <h3 style="font-size:22px;margin:0 0 24px;font-weight:700;color:var(--indigo-deep);">
+        ${e.title}
+      </h3>
+
+      <div style="display:flex;justify-content:center;gap:48px;margin-bottom:12px;font-size:13px;color:var(--muted);">
+        <div><strong style="color:var(--ink);display:block;font-size:14px;">${fmtDate(e.date, false)}</strong>Completion Date</div>
+        <div><strong style="color:var(--ink);display:block;font-size:14px;">${e.organizer}</strong>Faculty Chair</div>
+        <div><strong style="color:var(--ink);display:block;font-size:14px;">CampusBuzz University</strong>Accreditation</div>
+      </div>
+
+      <div style="font-size:11.5px;color:var(--muted-2);margin-top:24px;border-top:1px dashed var(--line);padding-top:16px;display:flex;justify-content:space-between;align-items:center;">
+        <span>Verification Hash: SHA256-V78B-X992</span>
+        <span>Certificate ID: <strong>${certId}</strong></span>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   NOTIFICATIONS (Clean SVG Icons)
+========================================================= */
+function notificationsPage(){
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <div>
+      <h1 style="font-size:25px;margin:0 0 4px;font-weight:700;">Notifications</h1>
+      <p style="color:var(--muted);font-size:13.5px;margin:0;">Real-time campus event alerts and registration confirmations.</p>
+    </div>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',15)} <span>Back</span></button>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:660px;">
+    ${notifications.map(n=>`
+      <div class="card" style="padding:15px 18px;display:flex;gap:14px;align-items:flex-start;background:${n.unread?'#F7F6FF':'#fff'};">
+        <div style="width:36px;height:36px;border-radius:10px;background:#EEEBFE;color:var(--indigo);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          ${ic(n.icon,17)}
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:13.5px;${n.unread?'font-weight:600;':''}">${n.text}</div>
+          <div style="font-size:12px;color:var(--muted-2);margin-top:3px;">${n.time}</div>
+        </div>
+        ${n.unread?'<div class="tag-dot" style="background:var(--indigo);margin-top:6px;"></div>':''}
+      </div>`).join('')}
+  </div>`;
+}
+
+/* =========================================================
+   PROFILE (Anushka Sugandhi)
+========================================================= */
+function profilePage(){
+  const name = state.role==='student'?CURRENT_STUDENT.name:state.role==='organizer'?CURRENT_ORGANIZER.name:CURRENT_ADMIN.name;
+  const certs = registrations.filter(r=>r.certIssued).length;
+  const attended = registrations.filter(r=>r.attended).length;
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">User Profile</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',15)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:20px;align-items:start;">
+    <div class="card card-pad" style="text-align:center;">
+      <div class="avatar" style="width:72px;height:72px;font-size:24px;margin:0 auto 14px;">
+        ${name.split(' ').map(n=>n[0]).join('').slice(0,2)}
+      </div>
+      <div style="font-weight:700;font-size:18px;">${name}</div>
+      <div style="color:var(--muted);font-size:13px;margin:4px 0 16px;">
+        ${state.role==='student'? CURRENT_STUDENT.dept+' &bull; '+CURRENT_STUDENT.year : state.role==='organizer'? CURRENT_ORGANIZER.club : CURRENT_ADMIN.role}
+      </div>
+
+      ${state.role==='student'?`
+      <div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;">
+        ${CURRENT_STUDENT.interests.map(i=>`
+          <span class="badge badge-indigo">
+            <span style="display:flex;">${ic(catInfo(i).iconName,11)}</span> ${catInfo(i).name}
+          </span>`).join('')}
+      </div>
+      <div class="divider" style="margin:16px 0;"></div>
+      <div style="display:flex;justify-content:space-around;">
+        <div><div style="font-weight:700;font-family:'Space Grotesk';font-size:20px;">${registrations.length}</div><div style="font-size:11px;color:var(--muted-2);">Registered</div></div>
+        <div><div style="font-weight:700;font-family:'Space Grotesk';font-size:20px;">${attended}</div><div style="font-size:11px;color:var(--muted-2);">Attended</div></div>
+        <div><div style="font-weight:700;font-family:'Space Grotesk';font-size:20px;">${certs}</div><div style="font-size:11px;color:var(--muted-2);">Certified</div></div>
+      </div>
+      `:''}
+    </div>
+
+    <div class="card card-pad">
+      <h3 style="margin:0 0 16px;font-size:15px;">Engagement Timeline</h3>
+      ${activityLog.map((a,i)=>timelineItem(a.time,a.text,'',i===activityLog.length-1)).join('')}
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   ORGANIZER: DASHBOARD & MANAGEMENT
+========================================================= */
+function myOrgEvents(){ return events.filter(e=>e.organizer===CURRENT_ORGANIZER.name); }
+
+function organizerDashboard(){
+  const mine = myOrgEvents();
+  const totalReg = mine.reduce((s,e)=>s+e.registered,0);
+  const avgRating = (mine.filter(e=>e.rating>0).reduce((s,e)=>s+e.rating,0) / (mine.filter(e=>e.rating>0).length||1)).toFixed(1);
+  const pending = mine.filter(e=>e.status==='pending');
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="font-size:25px;margin:0 0 4px;font-weight:700;">Organizer Portal &bull; ${CURRENT_ORGANIZER.name}</h1>
+      <p style="color:var(--muted);margin:0;font-size:14px;">Manage campus events, QR verify attendance, and monitor engagement for ${getTodayFormatted()}.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+      <button onclick="go('create-event')" class="btn btn-primary btn-sm">${ic('plus',14)} Create New Event</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;">
+    ${kpiCard('Organized Events', mine.length, ic('ticket',18), '#4F3DF5')}
+    ${kpiCard('Total Registrations', totalReg, ic('users',18), '#17B6C2')}
+    ${kpiCard('Average Rating', avgRating, ic('star',18), '#EAB308')}
+    ${kpiCard('Pending Approvals', pending.length, ic('clock',18), '#E11D48')}
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+    <h3 style="margin:0;font-size:16px;">My Event Portfolio</h3>
+    <button onclick="go('create-event')" class="btn btn-ghost btn-sm">${ic('plus',14)} Submit Event</button>
+  </div>
+  ${orgEventsTable(mine)}
+  `;
+}
+
+function orgEventsTable(mine){
+  return `<div class="card" style="overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+      <thead><tr style="background:#FAF9FE;text-align:left;">
+        <th style="padding:12px 16px;font-weight:600;color:var(--muted);">Event</th>
+        <th style="padding:12px 16px;font-weight:600;color:var(--muted);">Date</th>
+        <th style="padding:12px 16px;font-weight:600;color:var(--muted);">Registrations</th>
+        <th style="padding:12px 16px;font-weight:600;color:var(--muted);">Status</th>
+        <th style="padding:12px 16px;text-align:right;">Action</th>
+      </tr></thead>
+      <tbody>
+      ${mine.map(e=>`
+        <tr style="border-top:1px solid var(--line);cursor:pointer;" onclick="go('event-detail',{id:'${e.id}'})">
+          <td style="padding:14px 16px;font-weight:600;">${e.title}</td>
+          <td style="padding:14px 16px;color:var(--muted);">${fmtDate(e.date, true)}</td>
+          <td style="padding:14px 16px;">${e.registered}/${e.capacity}</td>
+          <td style="padding:14px 16px;">${statusBadge(e.status)}</td>
+          <td style="padding:14px 16px;text-align:right;">
+            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();go('attendance',{eventId:'${e.id}'})">QR Code &rarr;</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function statusBadge(s){
+  const map = {published:['badge-green','Published'],pending:['badge-yellow','Under Review'],draft:['badge-grey','Draft'],completed:['badge-indigo','Completed'],rejected:['badge-red','Changes Requested']};
+  const [cls,label] = map[s]||['badge-grey',s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function organizerEvents(){
+  const mine = myOrgEvents();
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">My Event Portfolio</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+  ${orgEventsTable(mine)}`;
+}
+
+function approvalsStatus(){
+  const mine = myOrgEvents().filter(e=>e.status==='pending' || e.status==='draft' || e.status==='rejected');
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Submission Approvals</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    ${mine.length? mine.map(e=>`
+      <div class="card card-pad" style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-weight:600;font-size:15px;">${e.title}</div>
+          <div style="font-size:12.5px;color:var(--muted-2);margin-top:2px;">Scheduled for ${fmtDate(e.date, true)} &bull; ${e.venue}</div>
+        </div>
+        ${statusBadge(e.status)}
+      </div>`).join('') : emptyState('All events reviewed','All your created events have been processed.','organizer-dashboard','Back to Dashboard')}
+  </div>`;
+}
+
+/* =========================================================
+   ORGANIZER: 3-STEP EVENT CREATOR (With Back Navigation)
+========================================================= */
+function createEvent(){
+  const step = state.createStep;
+  const d = state.createDraft;
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Create Campus Event</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+  <p style="color:var(--muted);margin:0 0 22px;font-size:13.5px;">Guided 3-step submission for administration review and calendar publish.</p>
+  
+  <div style="display:flex;gap:10px;margin-bottom:24px;max-width:540px;">
+    ${[1,2,3].map(n=>`<div style="flex:1;height:5px;border-radius:8px;background:${n<=step?'var(--indigo)':'var(--line)'};"></div>`).join('')}
+  </div>
+  <div class="card card-pad" style="max-width:620px;">
+    ${step===1?createStep1(d): step===2?createStep2(d): createStep3(d)}
+  </div>`;
+}
+
+function createStep1(d){
+  return `
+  <h3 style="margin:0 0 16px;font-size:17px;">Step 1: Event Details</h3>
+  <div class="field"><label>Event Title</label><input id="cf_title" value="${d.title||''}" placeholder="e.g. Next-Gen Web Architecture Sprint"></div>
+  <div class="field"><label>Detailed Description</label><textarea id="cf_desc" rows="3" placeholder="Explain the theme, target audience, and key highlights">${d.desc||''}</textarea></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="field"><label>Category</label><select id="cf_cat">${CATEGORIES.map(c=>`<option value="${c.id}" ${d.category===c.id?'selected':''}>${c.name}</option>`).join('')}</select></div>
+    <div class="field"><label>Department</label><select id="cf_dept">${DEPARTMENTS.map(dep=>`<option ${d.dept===dep?'selected':''}>${dep}</option>`).join('')}</select></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;">
+    <button class="btn btn-primary" onclick="createNext(1)">Continue to Step 2 ${ic('chevR',14)}</button>
+  </div>`;
+}
+
+function createStep2(d){
+  return `
+  <h3 style="margin:0 0 16px;font-size:17px;">Step 2: Date, Venue & Registration</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="field"><label>Event Date</label><input id="cf_date" type="date" value="${d.date||getRelativeDate(7)}"></div>
+    <div class="field"><label>Campus Venue</label><select id="cf_venue">${VENUES.map(v=>`<option ${d.venue===v.name?'selected':''}>${v.name}</option>`).join('')}</select></div>
+    <div class="field"><label>Start Time</label><input id="cf_start" value="${d.start||'10:00 AM'}"></div>
+    <div class="field"><label>Maximum Capacity</label><input id="cf_cap" type="number" value="${d.capacity||150}"></div>
+  </div>
+  <div class="field"><label>Registration Deadline</label><input id="cf_deadline" type="date" value="${d.deadline||getRelativeDate(5)}"></div>
+  <div style="display:flex;justify-content:space-between;">
+    <button class="btn btn-outline" onclick="state.createStep=1;rerenderRoute()">${ic('chevL',14)} Previous</button>
+    <button class="btn btn-primary" onclick="createNext(2)">Review Event ${ic('chevR',14)}</button>
+  </div>`;
+}
+
+function createStep3(d){
+  const c = catInfo(d.category||'tech');
+  return `
+  <h3 style="margin:0 0 16px;font-size:17px;">Step 3: Verification & Submission</h3>
+  <div class="card" style="padding:18px;margin-bottom:20px;background:#FAF9FE;">
+    <span class="badge badge-indigo" style="margin-bottom:10px;">${c.name}</span>
+    <div style="font-weight:700;font-size:16px;margin-bottom:6px;">${d.title||'Untitled Event'}</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;">${d.desc||'No description provided.'}</div>
+    <div style="font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px;">
+      <div>${ic('cal',12)} ${fmtDate(d.date||getRelativeDate(7), true)} &bull; ${d.start||'10:00 AM'}</div>
+      <div>${ic('pin',12)} ${d.venue||'Seminar Hall A'}</div>
+      <div>${ic('users',12)} Target Capacity: ${d.capacity||150} students</div>
+      <div>${ic('bldg',12)} Department: ${d.dept||'Computer Science'}</div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:space-between;gap:10px;">
+    <button class="btn btn-outline" onclick="state.createStep=2;rerenderRoute()">${ic('chevL',14)} Back</button>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline" onclick="saveDraft()">Save Draft</button>
+      <button class="btn btn-primary" onclick="submitForApproval()">Submit For Approval</button>
+    </div>
+  </div>`;
+}
+
+function createNext(fromStep){
+  const d = state.createDraft;
+  if(fromStep===1){
+    d.title = document.getElementById('cf_title').value;
+    d.desc = document.getElementById('cf_desc').value;
+    d.category = document.getElementById('cf_cat').value;
+    d.dept = document.getElementById('cf_dept').value;
+    if(!d.title){ toast('Please provide an event title', 'shield'); return; }
+  }
+  if(fromStep===2){
+    d.date = document.getElementById('cf_date').value;
+    d.venue = document.getElementById('cf_venue').value;
+    d.start = document.getElementById('cf_start').value;
+    d.capacity = parseInt(document.getElementById('cf_cap').value)||100;
+    d.deadline = document.getElementById('cf_deadline').value;
+  }
+  state.createStep = fromStep+1;
+  rerenderRoute();
+}
+
+function newEventFromDraft(status){
+  const d = state.createDraft;
+  const id = 'e'+(events.length+1)+Math.floor(Math.random()*99);
+  events.push({
+    id,
+    title: d.title||'Untitled Event',
+    category: d.category||'tech',
+    dept: d.dept||DEPARTMENTS[0],
+    desc: d.desc||'',
+    img: 'linear-gradient(135deg,#4F3DF5,#17B6C2)',
+    date: d.date||getRelativeDate(7),
+    start: d.start||'10:00 AM',
+    end: '3:00 PM',
+    venue: d.venue||VENUES[0].name,
+    deadline: d.deadline||getRelativeDate(5),
+    capacity: d.capacity||150,
+    registered: 0,
+    organizer: CURRENT_ORGANIZER.name,
+    club: CURRENT_ORGANIZER.club,
+    status,
+    rating: 0,
+    speakers: [],
+    schedule: [['10:00','Registration'],['10:30','Keynote Session'],['1:00','Interactive Workshop']]
+  });
+  state.createDraft = {};
+  state.createStep = 1;
+  return id;
+}
+
+function saveDraft(){ newEventFromDraft('draft'); toast('Draft saved to portfolio'); go('organizer-events'); }
+function submitForApproval(){ newEventFromDraft('pending'); toast('Submitted to administration'); go('approvals-status'); }
+
+/* =========================================================
+   ORGANIZER: ATTENDANCE & QR CODE DISPLAY
+========================================================= */
+function organizerAttendance(){
+  const mine = myOrgEvents().filter(e=>e.status==='published');
+  const sel = state.params.eventId || (mine[0] && mine[0].id);
+  const e = events.find(x=>x.id===sel);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Venue Check-In Terminal</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;">
+    <div class="card" style="padding:10px;">
+      <div style="font-size:12px;font-weight:700;color:var(--muted);padding:8px 10px;text-transform:uppercase;">Select Event</div>
+      ${mine.map(ev=>`
+        <div onclick="go('attendance',{eventId:'${ev.id}'})" style="padding:11px 12px;border-radius:10px;cursor:pointer;background:${ev.id===sel?'#F5F3FF':'transparent'};font-size:13px;font-weight:${ev.id===sel?600:500};margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;">
+          <span>${ev.title}</span>
+          ${ev.id===sel?`<span style="color:var(--indigo);display:flex;">${ic('check',14)}</span>`:''}
+        </div>`).join('')}
+    </div>
+
+    <div class="card card-pad" style="text-align:center;">
+      ${e?`
+      <h3 style="margin:0 0 4px;font-size:18px;">${e.title}</h3>
+      <p style="color:var(--muted);font-size:13px;margin:0 0 20px;">${fmtDate(e.date, true)} &bull; ${e.venue}</p>
+      
+      <div class="qr-box hover-lift" style="margin:0 auto 16px;">
+        <div style="text-align:center;">
+          <div style="color:var(--indigo);display:flex;justify-content:center;margin-bottom:8px;">${ic('qr',72)}</div>
+          <div style="font-size:11px;color:var(--muted-2);">Official Terminal Key: CB-${e.id.toUpperCase()}</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted-2);">Project this screen or have attendees scan this QR at the venue door.</p>
+
+      <div style="display:flex;justify-content:center;gap:32px;margin-top:22px;border-top:1px solid var(--line);padding-top:16px;">
+        <div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;">${registrations.filter(r=>r.eventId===e.id && r.attended).length}</div>
+          <div style="font-size:12px;color:var(--muted-2);">Checked In</div>
+        </div>
+        <div>
+          <div style="font-family:'Space Grotesk';font-weight:700;font-size:24px;">${e.registered}</div>
+          <div style="font-size:12px;color:var(--muted-2);">Total Registered</div>
+        </div>
+      </div>
+      `:`<p style="color:var(--muted);">No published events available for check-in.</p>`}
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   ORGANIZER: ANALYTICS (Charts with Dynamic Date Labels)
+========================================================= */
+function organizerAnalytics(){
+  const mine = myOrgEvents();
+  const totalReg = mine.reduce((s,e)=>s+e.registered,0);
+  const totalCap = mine.reduce((s,e)=>s+e.capacity,0);
+  const avgRating = (mine.filter(e=>e.rating>0).reduce((s,e)=>s+e.rating,0)/(mine.filter(e=>e.rating>0).length||1)).toFixed(1);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Organizer Analytics</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+    ${kpiCard('Total Registrations', totalReg, ic('users',18), '#4F3DF5')}
+    ${kpiCard('Capacity Fill Rate', pct(totalReg,totalCap)+'%', ic('chart',18), '#17B6C2')}
+    ${kpiCard('Attendance Rate', '88%', ic('check',18), '#16A34A')}
+    ${kpiCard('Avg. Participant Rating', avgRating, ic('star',18), '#EAB308')}
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+    <div class="card card-pad">
+      <h3 style="margin:0 0 14px;font-size:15px;">Registration Trajectory (Recent Weeks)</h3>
+      <canvas id="regTrendChart" height="170"></canvas>
+    </div>
+    <div class="card card-pad">
+      <h3 style="margin:0 0 14px;font-size:15px;">Actual Turnout vs No-Shows</h3>
+      <canvas id="attDonutChart" height="170"></canvas>
+    </div>
+    <div class="card card-pad" style="grid-column:1/3;">
+      <h3 style="margin:0 0 14px;font-size:15px;">Participation by Campus Department</h3>
+      <canvas id="deptBarChart" height="90"></canvas>
+    </div>
+  </div>`;
+}
+
+function drawAnalyticsCharts(){
+  Object.values(_charts).forEach(c=>c && c.destroy());
+  const ctx1 = document.getElementById('regTrendChart');
+  if(ctx1) _charts.reg = new Chart(ctx1, {type:'line', data:{labels:['Week -5','Week -4','Week -3','Week -2','Last Week','This Week'], datasets:[{label:'Registrations',data:[50,110,175,230,300,380],borderColor:'#4F3DF5',backgroundColor:'rgba(79,61,245,0.08)',fill:true,tension:0.35,pointRadius:3}]}, options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#EEECFB'}},x:{grid:{display:false}}}}});
+  const ctx2 = document.getElementById('attDonutChart');
+  if(ctx2) _charts.att = new Chart(ctx2, {type:'doughnut', data:{labels:['Attended','No-Show'],datasets:[{data:[88,12],backgroundColor:['#4F3DF5','#EDEBFB']}]}, options:{plugins:{legend:{position:'bottom'}},cutout:'70%'}});
+  const ctx3 = document.getElementById('deptBarChart');
+  if(ctx3) _charts.dept = new Chart(ctx3, {type:'bar', data:{labels:DEPARTMENTS, datasets:[{label:'Registrations',data:[230,95,65,155,115],backgroundColor:'#8B5CF6',borderRadius:6}]}, options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#EEECFB'}},x:{grid:{display:false}}}}});
+}
+
+/* =========================================================
+   ADMIN: DASHBOARD & GOVERNANCE
+========================================================= */
+function adminDashboard(){
+  const pending = events.filter(e=>e.status==='pending');
+  const totalReg = events.reduce((s,e)=>s+e.registered,0);
+  const published = events.filter(e=>e.status==='published').length;
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h1 style="font-size:25px;margin:0 0 4px;font-weight:700;">Campus Administration Overview</h1>
+      <p style="color:var(--muted);margin:0;font-size:14px;">Institutional oversight, venue allocations, and approval queue for ${getTodayFormatted()}.</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+      <button onclick="go('admin-approvals')" class="btn btn-primary btn-sm">${ic('check',14)} Review Pending (${pending.length})</button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+    ${kpiCard('Active Students', '850', ic('users',18), '#4F3DF5')}
+    ${kpiCard('Active Events', published, ic('ticket',18), '#17B6C2')}
+    ${kpiCard('Campus Registrations', totalReg, ic('chart',18), '#8B5CF6')}
+    ${kpiCard('Awaiting Approval', pending.length, ic('clock',18), '#E11D48')}
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;margin-bottom:24px;">
+    <div class="card card-pad">
+      <h3 style="margin:0 0 14px;font-size:15px;">Monthly Event Frequency Trend</h3>
+      <canvas id="adminActivityChart" height="170"></canvas>
+    </div>
+    <div class="card card-pad">
+      <h3 style="margin:0 0 14px;font-size:15px;">Events Distributed by Category</h3>
+      <canvas id="adminCategoryChart" height="170"></canvas>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+    <div class="card card-pad">
+      <h3 style="margin:0 0 14px;font-size:15px;">Pending Approval Queue</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${pending.length? pending.map(e=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--line);border-radius:12px;">
+            <div>
+              <div style="font-weight:600;font-size:14px;">${e.title}</div>
+              <div style="font-size:12px;color:var(--muted-2);margin-top:2px;">${e.dept} &bull; ${e.organizer} &bull; ${fmtDate(e.date, true)}</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="go('admin-approvals')">Review &rarr;</button>
+          </div>`).join('') : `<div style="color:var(--muted);font-size:13.5px;">All submissions reviewed. No pending approvals today.</div>`}
+      </div>
+    </div>
+
+    <div class="card card-pad">
+      <h3 style="margin:0 0 14px;font-size:15px;">Top Campus Events by Reach</h3>
+      ${[...events].sort((a,b)=>b.registered-a.registered).slice(0,4).map((e,i)=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;">
+          <div style="width:24px;height:24px;border-radius:50%;background:#EEEBFE;color:var(--indigo-deep);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+          <div style="flex:1;font-size:13.5px;font-weight:500;">${e.title}</div>
+          <div style="font-size:12.5px;color:var(--muted-2);">${e.registered} registered</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function drawAdminCharts(){
+  Object.values(_charts).forEach(c=>c && c.destroy());
+  const ctx1 = document.getElementById('adminActivityChart');
+  if(ctx1) _charts.a1 = new Chart(ctx1, {type:'line', data:{labels:['Week 1','Week 2','Week 3','Week 4','Week 5','This Week'], datasets:[{label:'Events',data:[3,6,7,9,12,15],borderColor:'#17B6C2',backgroundColor:'rgba(23,182,194,0.08)',fill:true,tension:0.35}]}, options:{plugins:{legend:{display:false}},scales:{y:{grid:{color:'#EEECFB'}},x:{grid:{display:false}}}}});
+  const ctx2 = document.getElementById('adminCategoryChart');
+  if(ctx2) _charts.a2 = new Chart(ctx2, {type:'doughnut', data:{labels:CATEGORIES.map(c=>c.name), datasets:[{data:CATEGORIES.map(c=>events.filter(e=>e.category===c.id).length), backgroundColor:CATEGORIES.map(c=>c.color)}]}, options:{plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:10.5}}}}}});
+}
+
+function adminApprovals(){
+  const pending = events.filter(e=>e.status==='pending');
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Event Approvals</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    ${pending.length? pending.map(e=>`
+      <div class="card card-pad">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:16px;">
+          <div>
+            <span class="badge badge-indigo" style="margin-bottom:8px;">${catInfo(e.category).name}</span>
+            <div style="font-weight:700;font-size:16px;">${e.title}</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:4px;">Organized by ${e.organizer} &bull; ${e.dept}</div>
+            <div style="font-size:12.5px;color:var(--muted-2);margin-top:6px;">
+              ${ic('cal',12)} ${fmtDate(e.date, true)} &bull; ${ic('pin',12)} ${e.venue} &bull; Target Capacity: ${e.capacity}
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-shrink:0;">
+            <button class="btn btn-danger btn-sm" onclick="rejectEvent('${e.id}')">Request Changes</button>
+            <button class="btn btn-primary btn-sm" onclick="approveEvent('${e.id}')">Approve & Publish</button>
+          </div>
+        </div>
+      </div>`).join('') : emptyState('Approval queue clear','There are no submissions waiting for review today.','admin-dashboard','Back to Dashboard')}
+  </div>`;
+}
+
+function approveEvent(id){
+  const e = events.find(x=>x.id===id);
+  if(e){
+    e.status='published';
+    toast('Event approved and published to student calendar');
+    rerenderRoute();
+  }
+}
+
+function rejectEvent(id){
+  const reason = prompt('Reason for requesting changes (sent to organizer):','Venue schedule conflict. Please choose an alternate slot.');
+  if(reason===null) return;
+  const e = events.find(x=>x.id===id);
+  if(e){
+    e.status='rejected';
+    e.rejectReason = reason;
+    toast('Requested changes from organizer', 'shield');
+    rerenderRoute();
+  }
+}
+
+/* =========================================================
+   ADMIN: USER MANAGEMENT (Anushka Sugandhi)
+========================================================= */
+function adminUsers(){
+  const rows = [
+    ['Anushka Sugandhi','Student','Computer Science','Active'],
+    ['Dr. Meera Rao','Organizer','Computer Science','Active'],
+    ['Prof. Karan Shah','Organizer','Electronics','Active'],
+    ['Ms. Ritu Bhalla','Organizer','Management Studies','Active'],
+    ['Institution Admin','Administrator','Central Administration','Active'],
+  ];
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Campus User Management</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div class="card" style="overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+      <thead><tr style="background:#FAF9FE;text-align:left;">
+        <th style="padding:12px 16px;color:var(--muted);">Name</th>
+        <th style="padding:12px 16px;color:var(--muted);">Role</th>
+        <th style="padding:12px 16px;color:var(--muted);">Department</th>
+        <th style="padding:12px 16px;color:var(--muted);">Status</th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(r=>`
+          <tr style="border-top:1px solid var(--line);">
+            <td style="padding:13px 16px;font-weight:600;">${r[0]}</td>
+            <td style="padding:13px 16px;">${r[1]}</td>
+            <td style="padding:13px 16px;color:var(--muted);">${r[2]}</td>
+            <td style="padding:13px 16px;"><span class="badge badge-green">${r[3]}</span></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function adminDepartments(){
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Academic Departments</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+    ${DEPARTMENTS.map(d=>{
+      const cnt = events.filter(e=>e.dept===d).length;
+      const reg = events.filter(e=>e.dept===d).reduce((s,e)=>s+e.registered,0);
+      return `
+      <div class="card card-pad hover-lift">
+        <div style="width:40px;height:40px;border-radius:10px;background:#EEEBFE;display:flex;align-items:center;justify-content:center;color:var(--indigo);margin-bottom:12px;">
+          ${ic('bldg',18)}
+        </div>
+        <div style="font-weight:600;font-size:15px;margin-bottom:4px;">${d}</div>
+        <div style="font-size:12.5px;color:var(--muted-2);">${cnt} events &bull; ${reg} registered students</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function adminVenues(){
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Campus Venues & Availability</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+    ${VENUES.map(v=>{
+      const booked = events.some(e=>e.venue===v.name && e.status==='published' && e.date===getRelativeDate(0));
+      return `
+      <div class="card card-pad">
+        <div style="display:flex;justify-content:space-between;align-items:start;">
+          <div>
+            <div style="font-weight:600;font-size:15px;">${v.name}</div>
+            <div style="font-size:12px;color:var(--muted-2);margin-top:2px;">${v.building}</div>
+          </div>
+          <span class="badge ${booked?'badge-red':'badge-green'}">${booked?'IN USE TODAY':'AVAILABLE TODAY'}</span>
+        </div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:14px;">Capacity: ${v.capacity} seats</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function adminAnalyticsPage(){
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+    <h1 style="font-size:25px;margin:0;font-weight:700;">Institution Accreditation Analytics</h1>
+    <button class="nav-back-btn" onclick="goBack()">${ic('arrowLeft',14)} <span>Back</span></button>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+    ${kpiCard('Accredited Certificates Issued', registrations.filter(r=>r.certIssued).length, ic('award',18), '#EAB308')}
+    ${kpiCard('Average Student Rating', '4.7 / 5.0', ic('star',18), '#8B5CF6')}
+    ${kpiCard('Overall Campus Turnout', '88%', ic('check',18), '#16A34A')}
+  </div>
+  <div class="card card-pad">
+    <h3 style="margin:0 0 14px;font-size:15px;">Engagement Density by Department</h3>
+    <canvas id="adminDeptChart" height="90"></canvas>
+  </div>`;
+}
+
+/* =========================================================
+   INITIALIZE & BROWSER HISTORY INTEGRATION
+========================================================= */
+window.addEventListener('popstate', (e) => {
+  if (state.history.length > 0) {
+    goBack();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
